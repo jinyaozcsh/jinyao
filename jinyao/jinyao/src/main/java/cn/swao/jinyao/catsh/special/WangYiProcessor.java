@@ -1,4 +1,4 @@
-package cn.swao.jinyao.cash;
+package cn.swao.jinyao.catsh.special;
 
 import java.io.*;
 import java.net.*;
@@ -27,7 +27,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.processor.example.GithubRepoPageProcessor;
 import us.codecraft.webmagic.selector.*;
 
-public class CashNews implements PageProcessor {
+public class WangYiProcessor implements PageProcessor {
 
 	private String[] urls = { "http://temp.163.com/special/00804KVA/cm_yaowen.js",
 			"http://public.house.163.com/special/03531F4E/index_news.js",
@@ -225,7 +225,7 @@ public class CashNews implements PageProcessor {
 	}
 
 	public static void main(String[] args) {
-		CashNews cashNews = new CashNews();
+		WangYiProcessor cashNews = new WangYiProcessor();
 		cashNews.read2();
 	}
 
