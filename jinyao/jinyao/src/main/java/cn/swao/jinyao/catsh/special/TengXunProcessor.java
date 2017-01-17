@@ -23,8 +23,14 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.Selectable;
 
+/**
+ * 
+ * @author ShenJX
+ * @date 2017年1月17日
+ * @desc desc:腾讯新闻抓爬
+ */
 public class TengXunProcessor implements PageProcessor {
-
+    
 	private static final String StartUrlFormat = "http://roll.news.qq.com/interface/roll.php?cata=newsgn,newsgj,newssh,milite&site=news&mode=1&of=json&page=%s&date=%s";
 
 	// 起始页

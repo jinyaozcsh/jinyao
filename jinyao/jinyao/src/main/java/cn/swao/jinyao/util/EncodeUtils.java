@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 /**
  * 
  * @author ShenJX
- *
+ * @date 2017年1月17日
+ * @desc desc:编码工具类
  */
 public class EncodeUtils {
 	/**
