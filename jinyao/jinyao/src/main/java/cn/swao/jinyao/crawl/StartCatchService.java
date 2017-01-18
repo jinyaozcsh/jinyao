@@ -1,16 +1,14 @@
-package cn.swao.jinyao.catsh;
+package cn.swao.jinyao.crawl;
 
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cn.swao.jinyao.catsh.special.ActualNewsProcessor;
-import cn.swao.jinyao.catsh.special.ActualNewsProcessor.IActualNewsSave;
-import cn.swao.jinyao.catsh.special.SoundNewsProcessor;
-import cn.swao.jinyao.catsh.special.SoundNewsProcessor.ISoundNewsSave;
+import cn.swao.jinyao.crawl.special.*;
+import cn.swao.jinyao.crawl.special.ActualNewsProcessor.IActualNewsSave;
+import cn.swao.jinyao.crawl.special.SoundNewsProcessor.ISoundNewsSave;
 import us.codecraft.webmagic.Spider;
 
 /**

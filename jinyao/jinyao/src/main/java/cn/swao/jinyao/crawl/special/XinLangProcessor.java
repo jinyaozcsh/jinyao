@@ -1,4 +1,4 @@
-package cn.swao.jinyao.catsh.special;
+package cn.swao.jinyao.crawl.special;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
