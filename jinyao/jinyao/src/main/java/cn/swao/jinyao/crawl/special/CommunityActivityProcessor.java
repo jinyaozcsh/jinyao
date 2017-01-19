@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.assertj.core.util.Strings;
 import org.junit.Test;
 
 import cn.swao.baselib.util.ArrayUtils;
@@ -86,28 +87,33 @@ public class CommunityActivityProcessor implements PageProcessor {
         } else {
             // 正文
             Request request = page.getRequest();
-            String activityAddress = request.getExtra("activityAddress").toString();
-            String activityArea = request.getExtra("activityArea").toString();
-            String activityIconUrl = request.getExtra("activityIconUrl").toString();
-            String activityId = request.getExtra("activityId").toString();
-            String activityName = request.getExtra("activityName").toString();
-            String activitySite = request.getExtra("activitySite").toString();
-            String activityStartTime = request.getExtra("activityStartTime").toString();
-            String activityEndTime = request.getExtra("activityEndTime").toString();
+            Object activityAddress = request.getExtra("activityAddress");
+            Object activityArea = request.getExtra("activityArea");
+            Object activityIconUrl = request.getExtra("activityIconUrl");
+            Object activityId = request.getExtra("activityId");
+            Object activityName = request.getExtra("activityName");
+            Object activityStartTime = request.getExtra("activityStartTime");
+            Object activityEndTime = request.getExtra("activityEndTime");
+            Object activitySite = request.getExtra("activitySite");
             String activityUrl = page.getUrl().get();
 
             // 解析内容页面
             String phone = page.getHtml().xpath("//*[@id='allInfo']//p[@class='phone']/span/text()").get();
-            String content = page.getHtml().xpath("//*[@id='allInfo']//div[@class='ad_intro']").get();
+            String content = page.getHtml().xpath("//*[@id='allInfo']//div[@class='ad_intro']/html()").get();
             Hashtable<String, Object> table = new Hashtable<>();
             table.put("activityAddress", activityAddress);
             table.put("activityName", activityName);
             table.put("activityArea", activityArea);
             table.put("activityIconUrl", activityIconUrl);
             table.put("activityId", activityId);
-            table.put("activitySite", activitySite);
             table.put("activityStartTime", activityStartTime);
-            table.put("activityEndTime", activityEndTime);
+            // 可能为空
+            if (activityEndTime != null) {
+                table.put("activityEndTime", activityEndTime);
+            }
+            if (activitySite != null) {
+                table.put("activitySite", activitySite);
+            }
             table.put("activityUrl", activityUrl);
             table.put("phone", phone);
             table.put("content", content);
@@ -122,11 +128,6 @@ public class CommunityActivityProcessor implements PageProcessor {
 
     private String getRealUrl(String format, Object arg) {
         return String.format(format, arg);
-    }
-
-    @Test
-    public void test() {
-        Spider.create(new CommunityActivityProcessor()).addUrl(START_URL).run();
     }
 
     public interface ICommunityActivitySave {

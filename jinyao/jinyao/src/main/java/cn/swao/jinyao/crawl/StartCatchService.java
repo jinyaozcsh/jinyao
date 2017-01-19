@@ -7,12 +7,15 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cn.swao.baselib.util.JSONUtils;
+import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.crawl.special.ActualNewsProcessor;
 import cn.swao.jinyao.crawl.special.ActualNewsProcessor.IActualNewsSave;
 import cn.swao.jinyao.crawl.special.CommunityActivityProcessor;
 import cn.swao.jinyao.crawl.special.CommunityActivityProcessor.ICommunityActivitySave;
 import cn.swao.jinyao.crawl.special.SoundNewsProcessor;
 import cn.swao.jinyao.crawl.special.SoundNewsProcessor.ISoundNewsSave;
+import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.Spider;
 
 /**
@@ -22,21 +25,21 @@ import us.codecraft.webmagic.Spider;
  * @desc desc:爬虫启动类
  */
 @Service
-public class StartCatchService implements IActualNewsSave, ISoundNewsSave ,ICommunityActivitySave{
+public class StartCatchService implements IActualNewsSave, ISoundNewsSave, ICommunityActivitySave {
 
     @Autowired
     private ActualNewsProcessor actualNewsProcessor;
 
     @Autowired
     private SoundNewsProcessor soundNewsProcessor;
-    
+
     @Autowired
-    private CommunityActivityProcessor communityActivityProcessor; 
+    private CommunityActivityProcessor communityActivityProcessor;
 
     @Test
     public void test() {
         // startActualNews();
-//        startSoundNews();
+        // startSoundNews();
         startCommunityActivity();
     }
 
@@ -65,14 +68,14 @@ public class StartCatchService implements IActualNewsSave, ISoundNewsSave ,IComm
         // spider.start();
 
     }
-    
+
     /**
-     * 启动语音新闻抓爬
+     * 启动社区新闻抓爬
      */
     public void startCommunityActivity() {
         CommunityActivityProcessor communityActivityProcessor = new CommunityActivityProcessor();
         communityActivityProcessor.setSaveCallBack(this);
-        Spider.create(communityActivityProcessor).addUrl(CommunityActivityProcessor.START_URL).run();
+        Spider.create(communityActivityProcessor).thread(1000).addUrl(CommunityActivityProcessor.START_URL).run();
         // Spider spider = Spider.create(soundNewsProcessor);
         // spider.addUrl(SoundNewsProcessor.START_URL);
         // spider.start();
@@ -116,6 +119,7 @@ public class StartCatchService implements IActualNewsSave, ISoundNewsSave ,IComm
      */
     @Override
     public void communityActivitysvae(Hashtable<String, Object> table) {
-        actualNewsSave(table);
+        // actualNewsSave(table);
+        FileUtils.putFile("D:shequ.txt", JSONUtils.toJson(table));
     }
 }
