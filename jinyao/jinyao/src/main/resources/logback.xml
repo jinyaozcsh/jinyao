@@ -45,7 +45,7 @@
 		</rollingPolicy>
 	</appender>
 
-	<root level="ERROR">
+	<root level="INfo">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE-AUDIT" />
 		<appender-ref ref="FILE-ERROR" />

@@ -12,17 +12,18 @@ public class RedianProcessor implements PageProcessor {
 
     String detailUrl = "https://newswifiapi.dftoutiao.com/jsonnew/newsinfo?rowkey=%s&url=%s";
 
-    static String url = "https://newswifiapi.dftoutiao.com/jsonnew/refreshjp?type=shanghai&qid=eastnb";
+    public static String url = "https://newswifiapi.dftoutiao.com/jsonnew/refreshjp?type=shanghai&qid=eastnb";
     String nexturl = "https://newswifiapi.dftoutiao.com/jsonnew/nextjp?type=shanghai&qid=eastnb&startkey=";
 
     @Override
     public Site getSite() {
-        return Site.me().setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36").setSleepTime(0).setRetryTimes(3);
+        Site site = Site.me().setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36").addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8").setSleepTime(0).setRetryTimes(3);
+        return site;
     }
 
     @Override
     public void process(Page page) {
-        if (page.getUrl().regex(url).match() || page.getUrl().get().contains(nexturl)) {
+        if (page.getUrl().get().equals(url) || page.getUrl().get().contains(nexturl)) {
 
             String str = page.getJson().removePadding("null").get();
             Map<String, Object> map = null;
@@ -79,7 +80,8 @@ public class RedianProcessor implements PageProcessor {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        System.setProperty("javax.net.ssl.trustStore", "D:\\git\\jinyao\\jinyao\\jinyao\\jssecacerts");
         Spider.create(new RedianProcessor()).addUrl(url).thread(5).run();
     }
 

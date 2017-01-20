@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.netty.channel.SucceededChannelFuture;
+import org.springframework.stereotype.Service;
 
 import cn.swao.framework.api.CustomBizException;
 import cn.swao.framework.util.WebUtils;
@@ -18,6 +19,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
  * @date 2017年1月17日
  * @desc 语音新闻抓取
  */
+@Service
 public class SoundNewsProcessor implements PageProcessor {
 
     // 保存回调接口
