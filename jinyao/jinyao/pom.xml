@@ -66,9 +66,14 @@
 			</exclusions>
 		</dependency>
 		<!-- 自有项目 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.eastnb</groupId>
 			<artifactId>middletier</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency> -->
+		<dependency>
+			<groupId>cn.swao</groupId>
+			<artifactId>framework</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
