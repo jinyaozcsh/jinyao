@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Service;
+
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.edu.hfut.dmic.contentextractor.News;
 import us.codecraft.webmagic.Page;
@@ -24,6 +26,7 @@ import us.codecraft.webmagic.selector.Selectable;
  * @date 2017年1月17日
  * @desc desc:腾讯新闻抓爬
  */
+@Service
 public class TengXunProcessor implements PageProcessor {
 
     private static final String StartUrlFormat = "http://roll.news.qq.com/interface/roll.php?cata=newsgn,newsgj,newssh,milite&site=news&mode=1&of=json&page=%s&date=%s";

@@ -42,11 +42,10 @@ import javax.net.ssl.*;
   
 public class InstallCert {  
   
-    public static void main(String[] args) throws Exception {  
+    public static void createCert(File file,String... h) throws Exception {  
     String host;  
     int port;  
     char[] passphrase;  
-    String[] h={"newswifiapi.dftoutiao.com"};  
     if ((h.length == 1) || (h.length == 2)) {  
         String[] c = h[0].split(":");  
         host = c[0];  
@@ -57,7 +56,7 @@ public class InstallCert {
         return;  
     }  
   
-    File file = new File("jssecacerts");  
+    /*File file = new File("jssecacerts");  
     if (file.isFile() == false) {  
         char SEP = File.separatorChar;  
         File dir = new File(System.getProperty("java.home") + SEP  
@@ -66,7 +65,7 @@ public class InstallCert {
         if (file.isFile() == false) {  
         file = new File(dir, "cacerts");  
         }  
-    }  
+    }  */
     System.out.println("Loading KeyStore " + file.getAbsolutePath() + "...");  
     InputStream in = new FileInputStream(file);  
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());  

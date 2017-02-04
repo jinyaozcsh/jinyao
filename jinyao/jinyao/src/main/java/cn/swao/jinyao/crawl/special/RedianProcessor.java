@@ -2,17 +2,20 @@ package cn.swao.jinyao.crawl.special;
 
 import java.util.*;
 
+import org.springframework.stereotype.Service;
+
 import cn.swao.baselib.util.JSONUtils;
 import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.*;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+@Service
 public class RedianProcessor implements PageProcessor {
 
     String detailUrl = "https://newswifiapi.dftoutiao.com/jsonnew/newsinfo?rowkey=%s&url=%s";
 
-    public static String url = "https://newswifiapi.dftoutiao.com/jsonnew/refreshjp?type=shanghai&qid=eastnb";
+    public String url = "https://newswifiapi.dftoutiao.com/jsonnew/refreshjp?type=shanghai&qid=eastnb";
     String nexturl = "https://newswifiapi.dftoutiao.com/jsonnew/nextjp?type=shanghai&qid=eastnb&startkey=";
 
     @Override
@@ -78,11 +81,6 @@ public class RedianProcessor implements PageProcessor {
             }
         }
 
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.setProperty("javax.net.ssl.trustStore", "D:\\git\\jinyao\\jinyao\\jinyao\\jssecacerts");
-        Spider.create(new RedianProcessor()).addUrl(url).thread(5).run();
     }
 
 }

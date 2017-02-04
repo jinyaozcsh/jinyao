@@ -2,16 +2,19 @@ package cn.swao.jinyao.crawl.special;
 
 import java.util.*;
 
+import org.springframework.stereotype.Service;
+
 import cn.swao.baselib.util.JSONUtils;
 import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.*;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+@Service
 public class QuxianProcessor implements PageProcessor {
 
-    String url = "http://city.eastday.com/eastday/n1002826/n1004932/n1004933/n1007783/index_t1282.html";
-    String detailUrl = "http://share.eastday.com/newsapi/api/news/Detailmain/%s";
+    public String url = "http://city.eastday.com/eastday/n1002826/n1004932/n1004933/n1007783/index_t1282.html";
+    public String detailUrl = "http://share.eastday.com/newsapi/api/news/Detailmain/%s";
 
     int index = 0;
 

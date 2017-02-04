@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.edu.hfut.dmic.contentextractor.News;
@@ -26,6 +27,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
  * @date 2017年1月17日
  * @desc desc:新浪新闻抓爬
  */
+@Service
 public class XinLangProcessor implements PageProcessor {
     private Site site = Site.me().setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36").setSleepTime(1000).setTimeOut(1000 * 10).setRetryTimes(10).setCycleRetryTimes(10);
 
