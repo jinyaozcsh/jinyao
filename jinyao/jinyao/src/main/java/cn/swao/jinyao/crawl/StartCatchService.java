@@ -3,6 +3,8 @@ package cn.swao.jinyao.crawl;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.sound.midi.SysexMessage;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,7 +77,7 @@ public class StartCatchService implements IActualNewsSave, ISoundNewsSave, IComm
     public void startCommunityActivity() {
         CommunityActivityProcessor communityActivityProcessor = new CommunityActivityProcessor();
         communityActivityProcessor.setSaveCallBack(this);
-        Spider.create(communityActivityProcessor).thread(1000).addUrl(CommunityActivityProcessor.START_URL).run();
+        Spider.create(communityActivityProcessor).thread(10).addUrl(CommunityActivityProcessor.START_URL).run();
         // Spider spider = Spider.create(soundNewsProcessor);
         // spider.addUrl(SoundNewsProcessor.START_URL);
         // spider.start();
@@ -120,6 +122,6 @@ public class StartCatchService implements IActualNewsSave, ISoundNewsSave, IComm
     @Override
     public void communityActivitysvae(Hashtable<String, Object> table) {
         // actualNewsSave(table);
-        FileUtils.putFile("D:shequ.txt", JSONUtils.toJson(table));
+        FileUtils.putFile("D:shequ111.txt", JSONUtils.toJson(table));
     }
 }
