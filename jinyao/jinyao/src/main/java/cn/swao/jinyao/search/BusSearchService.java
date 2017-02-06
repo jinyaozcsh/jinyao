@@ -5,14 +5,18 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.JsonObject;
-import com.mongodb.client.*;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCursor;
 
 import cn.swao.baselib.util.*;
-import cn.swao.jinyao.util.MongodbUtils;
 
 public class BusSearchService {
+
+    @Autowired
+    private MongoClient MongoClient;
 
     String detailBusInfo = "http://xxbs.sh.gov.cn:8080/weixinpage/HandlerThree.ashx?name=%s&lineid=%s&stopid=%s&direction=%s";
 
@@ -30,7 +34,7 @@ public class BusSearchService {
 
     public String getTimeBus(String str, Double[] d, int status) throws Exception {
         String result = "";
-        MongoCursor<Document> it = MongodbUtils.getCollectionIt("bus_line");
+        MongoCursor<Document> it = MongoClient.getDatabase("eastnb").getCollection("bus_line").find().iterator();
         String rode = str + "路";
         if (status == 2) {
             while (it.hasNext()) {
@@ -176,130 +180,130 @@ public class BusSearchService {
         return status;
     }
 
-    public static String bulidTextZHToALB(String text) {  
-        Pattern p = Pattern.compile(numRegex);  
-        Matcher m = p.matcher(text);  
-          
-        while(m.find()) {  
-            String numZH = m.group();  
-            if(numZH.length() !=1 || numMap.containsKey(numZH) || zhTen.equals(numZH)) {  
-                String numALB = NumZHToALB(numZH);  
-                text = text.replaceFirst(numZH, numALB);  
-            }  
-        }  
-          
-        return text;  
-    }  
-      
-    private static String NumZHToALB(String numZH) {  
-        int numALB = 0;  
-        int formIndex = 0;  
-        for(String unitNum : unitNumMap.keySet()) {  
-            int index = numZH.indexOf(unitNum);  
-            if(index != -1 ) {  
-                numALB += NumZHToALB(numZH.substring(formIndex, index),  unitNumMap.get(unitNum));  
-                formIndex = index + 1;  
-            }  
-        }  
-          
-        numALB += NumZHToALB(numZH.substring(formIndex),  1);  
-        return String.valueOf(numALB);  
-    }  
-      
-    private static int NumZHToALB(String numZH, int unitNum) {  
-        int length = numZH.length();  
-        int numALB = 0;  
-        if(length != 0) {  
-            int fromIndex = 0;  
-            for(String unit : unitMap.keySet()) {  
-                int index = numZH.indexOf(unit, fromIndex);  
-                if(index != -1) {  
-                    fromIndex = index + unit.length();  
-                    String prevChar = zhOne;  
-                    if(index != 0 && numMap.containsKey(prevChar)) {  
-                        prevChar = String.valueOf(numZH.charAt(index - 1));  
-                    }   
-                    numALB += numMap.get(prevChar) * unitMap.get(unit);  
-                }  
-            }  
-              
-            String lastChar = String.valueOf(numZH.charAt(length - 1));  
-            if(numMap.containsKey(lastChar)) {  
-                String pChar = zhTen;  
-                if(length != 1) {  
-                    pChar = String.valueOf(numZH.charAt(length - 2));  
-                    if(zhZero.equals(pChar)) {  
-                        pChar = zhTen;  
-                    }  
-                }  
-                numALB += numMap.get(lastChar) * unitMap.get(pChar)/10;  
-            }  
-        }  
-          
-        return numALB * unitNum;  
-    }  
-      
-    private static String encodeUnicode(String gbString) {     
-        char[] utfBytes = gbString.toCharArray();     
-        String unicodeBytes = "";     
-        for (int i : utfBytes) {     
-            String hexB = Integer.toHexString(i);     
-            if (hexB.length() <= 2) {     
-                hexB = "00" + hexB;     
-            }     
-            unicodeBytes = unicodeBytes + "\\u" + hexB;     
-        }  
-        return unicodeBytes;  
-    }  
-      
-    private static final String zhZero = "零";  
-    private static final String zhOne = "一";  
-    private static final String zhTen = "十";  
-      
-    private static final Map<String, Integer> numMap = new HashMap<String, Integer>();  
-    static {  
-        numMap.put("零", 0);  
-        numMap.put("一", 1);  
-        numMap.put("二", 2);  
-        numMap.put("三", 3);  
-        numMap.put("四", 4);  
-        numMap.put("五", 5);  
-        numMap.put("六", 6);  
-        numMap.put("七", 7);  
-        numMap.put("八", 8);  
-        numMap.put("九", 9);  
-    }  
-      
-    private static final Map<String, Integer> unitNumMap = new LinkedHashMap<String, Integer>();  
-    static {  
-        unitNumMap.put("亿", 100000000);  
-        unitNumMap.put("万", 10000);  
-    }  
-      
-    private static final Map<String, Integer> unitMap = new LinkedHashMap<String, Integer>();  
-    static {  
-        unitMap.put("千", 1000);  
-        unitMap.put("百", 100);  
-        unitMap.put("十", 10);  
-    }  
-      
-    private static String numRegex;  
-    static {  
-        numRegex = "[";  
-        for(String s : numMap.keySet()) {  
-            numRegex += encodeUnicode(s);  
-        }  
-        for(String s : unitMap.keySet()) {  
-            numRegex += encodeUnicode(s);  
-        }  
-        for(String s : unitNumMap.keySet()) {  
-            numRegex += encodeUnicode(s);  
-        }  
-        numRegex += "]+";  
-    }  
+    public static String bulidTextZHToALB(String text) {
+        Pattern p = Pattern.compile(numRegex);
+        Matcher m = p.matcher(text);
+
+        while (m.find()) {
+            String numZH = m.group();
+            if (numZH.length() != 1 || numMap.containsKey(numZH) || zhTen.equals(numZH)) {
+                String numALB = NumZHToALB(numZH);
+                text = text.replaceFirst(numZH, numALB);
+            }
+        }
+
+        return text;
+    }
+
+    private static String NumZHToALB(String numZH) {
+        int numALB = 0;
+        int formIndex = 0;
+        for (String unitNum : unitNumMap.keySet()) {
+            int index = numZH.indexOf(unitNum);
+            if (index != -1) {
+                numALB += NumZHToALB(numZH.substring(formIndex, index), unitNumMap.get(unitNum));
+                formIndex = index + 1;
+            }
+        }
+
+        numALB += NumZHToALB(numZH.substring(formIndex), 1);
+        return String.valueOf(numALB);
+    }
+
+    private static int NumZHToALB(String numZH, int unitNum) {
+        int length = numZH.length();
+        int numALB = 0;
+        if (length != 0) {
+            int fromIndex = 0;
+            for (String unit : unitMap.keySet()) {
+                int index = numZH.indexOf(unit, fromIndex);
+                if (index != -1) {
+                    fromIndex = index + unit.length();
+                    String prevChar = zhOne;
+                    if (index != 0 && numMap.containsKey(prevChar)) {
+                        prevChar = String.valueOf(numZH.charAt(index - 1));
+                    }
+                    numALB += numMap.get(prevChar) * unitMap.get(unit);
+                }
+            }
+
+            String lastChar = String.valueOf(numZH.charAt(length - 1));
+            if (numMap.containsKey(lastChar)) {
+                String pChar = zhTen;
+                if (length != 1) {
+                    pChar = String.valueOf(numZH.charAt(length - 2));
+                    if (zhZero.equals(pChar)) {
+                        pChar = zhTen;
+                    }
+                }
+                numALB += numMap.get(lastChar) * unitMap.get(pChar) / 10;
+            }
+        }
+
+        return numALB * unitNum;
+    }
+
+    private static String encodeUnicode(String gbString) {
+        char[] utfBytes = gbString.toCharArray();
+        String unicodeBytes = "";
+        for (int i : utfBytes) {
+            String hexB = Integer.toHexString(i);
+            if (hexB.length() <= 2) {
+                hexB = "00" + hexB;
+            }
+            unicodeBytes = unicodeBytes + "\\u" + hexB;
+        }
+        return unicodeBytes;
+    }
+
+    private static final String zhZero = "零";
+    private static final String zhOne = "一";
+    private static final String zhTen = "十";
+
+    private static final Map<String, Integer> numMap = new HashMap<String, Integer>();
+    static {
+        numMap.put("零", 0);
+        numMap.put("一", 1);
+        numMap.put("二", 2);
+        numMap.put("三", 3);
+        numMap.put("四", 4);
+        numMap.put("五", 5);
+        numMap.put("六", 6);
+        numMap.put("七", 7);
+        numMap.put("八", 8);
+        numMap.put("九", 9);
+    }
+
+    private static final Map<String, Integer> unitNumMap = new LinkedHashMap<String, Integer>();
+    static {
+        unitNumMap.put("亿", 100000000);
+        unitNumMap.put("万", 10000);
+    }
+
+    private static final Map<String, Integer> unitMap = new LinkedHashMap<String, Integer>();
+    static {
+        unitMap.put("千", 1000);
+        unitMap.put("百", 100);
+        unitMap.put("十", 10);
+    }
+
+    private static String numRegex;
+    static {
+        numRegex = "[";
+        for (String s : numMap.keySet()) {
+            numRegex += encodeUnicode(s);
+        }
+        for (String s : unitMap.keySet()) {
+            numRegex += encodeUnicode(s);
+        }
+        for (String s : unitNumMap.keySet()) {
+            numRegex += encodeUnicode(s);
+        }
+        numRegex += "]+";
+    }
 
     public static void main(String[] args) throws Exception {
-        //System.out.println(bulidTextZHToALB("一十三如"));
-         System.out.println(new BusSearchService().getBusInfo("六十四路公交车什么时候到", new Double[] { 31.21336130000, 121.39351510000 }));
+        // System.out.println(bulidTextZHToALB("一十三如"));
+        System.out.println(new BusSearchService().getBusInfo("六十四路公交车什么时候到", new Double[] { 31.21336130000, 121.39351510000 }));
     }
 }

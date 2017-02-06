@@ -55,7 +55,7 @@ public class DataUtils {
         long timeFormat = timeFormat(dateString + " " + time, dateTimeFormat);
         long delay = timeFormat - System.currentTimeMillis();
         if (delay < 0) {
-            timeFormat = timeFormat + 60 * 60 * 24 * 1000;
+            delay = timeFormat + 60 * 60 * 24 * 1000;
         }
         return delay;
     }
