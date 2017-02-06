@@ -41,9 +41,10 @@ public class TaskScheduler {
                     } catch (Exception e) {
                         log.info("开启定时调度爬虫失败，method={},startTime={},period={},explain={}", method, startTime, period, explain);
                     }
-                    log.info("定时调度爬取数据：method={},startTime={},period={},explain={}", method, startTime, period, explain);
+                    log.info("定时调度爬取数据sucess：explain={}", explain);
                 }
-            }, DataUtils.timeFormat(startTime), Long.valueOf(period));// 这里设定将延时每天固定执行
+            }, DataUtils.delayed(startTime), Long.valueOf(period));// 这里设定将延时每天固定执行
+            log.info("加载定时调度爬取数据：method={},startTime={},period={},explain={}，sucess", method, startTime, period, explain);
         }
     }
 

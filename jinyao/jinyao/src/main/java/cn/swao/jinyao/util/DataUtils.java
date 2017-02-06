@@ -3,6 +3,8 @@ package cn.swao.jinyao.util;
 import java.text.*;
 import java.util.Date;
 
+import org.slf4j.*;
+
 /**
  * 
  * @author ShenJX
@@ -11,6 +13,7 @@ import java.util.Date;
  */
 public class DataUtils {
 
+    private static Logger log = LoggerFactory.getLogger(DataUtils.class);
     public final static String sDateFormat = "yyyy-MM-dd";
     public final static String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -43,25 +46,18 @@ public class DataUtils {
      * @return
      */
     public static boolean isWithinTheDateRange(Date date, Date dataDate, int day) {
-<<<<<<< HEAD
-        // 当前日期的天的时间戳
-        long dayTimeStamp = date.getTime() / (60 * 60 * 24 * 1000);
-        // 数据天的时间戳
-        long timeStamp = dataDate.getTime() / (60 * 60 * 24 * 1000);
-        if (timeStamp >= dayTimeStamp - day) {
-            return true;
-        } else {
-            return false;
-        }
-=======
-        return isWithinTheDateRange(date,dataDate.getTime(),day);
->>>>>>> 6efeed88df099eb3808bf2e50fd4d69fe892fdae
+        return isWithinTheDateRange(date, dataDate.getTime(), day);
     }
 
-    public static long timeFormat(String time) {
+    public static long delayed(String time) {
         SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
         String dateString = sdf.format(new Date());
-        return timeFormat(dateString + " " + time, dateTimeFormat);
+        long timeFormat = timeFormat(dateString + " " + time, dateTimeFormat);
+        long delay = timeFormat - System.currentTimeMillis();
+        if (delay < 0) {
+            timeFormat = timeFormat + 60 * 60 * 24 * 1000;
+        }
+        return delay;
     }
 
     public static long timeFormat(String time, String format) {
@@ -70,6 +66,7 @@ public class DataUtils {
             Date date = sdf.parse(time);
             return date.getTime();
         } catch (ParseException e) {
+            log.info("format date fail", e);
             return 0L;
         }
 
