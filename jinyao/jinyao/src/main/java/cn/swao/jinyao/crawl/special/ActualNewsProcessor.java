@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.beust.jcommander.Strings;
 
+import cn.swao.jinyao.model.News;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -60,7 +61,7 @@ public class ActualNewsProcessor implements PageProcessor {
             // 解析json
             JSONObject jsonObject = new JSONObject(page.getJson().get());
             JSONArray jsonArray = jsonObject.getJSONArray("newslist");
-            List<Hashtable<Object, Object>> list = new ArrayList<>();
+            List<News> list = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject newsJsonObjcet = jsonArray.getJSONObject(i);
                 String newstitle = newsJsonObjcet.getString("newstitle");
@@ -80,16 +81,18 @@ public class ActualNewsProcessor implements PageProcessor {
                 } else {
                     // 新闻链接为空
                     // 直接保存当前的属性
-                    Hashtable<Object, Object> table = new Hashtable<Object, Object>();
-                    table.put("newstitle", newstitle);
-                    table.put("newsimg", newsimg);
-                    table.put("newszy", newszy);
-                    table.put("newstime", newstime);
-                    table.put("code", CODE_FAIL);
-                    list.add(table);
+                    News news = new News();
+                    news.setNewsTime(newstime);
+                    news.setNewsType(News.TYPE_NEWS_ACTUAL);
+                    List<String> listImage = new ArrayList<>();
+                    listImage.add(newsimg);
+                    news.setCoverImage(listImage);
+                    news.setTitle(newstitle);
+                    news.setSummary(newszy);
+                    list.add(news);
                 }
             }
-            page.putField("list", list);
+            page.putField("modle", list);
         } else {
             // 获取额外数据
             Request request = page.getRequest();
@@ -107,23 +110,30 @@ public class ActualNewsProcessor implements PageProcessor {
                 content = addImgPrefix(IMG_PREFIX, content);
                 String name = dataObject.getString("name");
                 String date = dataObject.getString("date");
-                page.putField("newstitle", newstitle);
-                page.putField("newsimg", newsimg);
-                page.putField("newszy", newszy);
-                page.putField("newstime", newstime);
-                page.putField("newslink", newslink);
-                page.putField("name", name);
-                page.putField("content", content);
-                page.putField("date", date);
-                page.putField("code", CODE_SUCCESS);
+                
+                News news = new News();
+                news.setNewsTime(date);
+                news.setNewsType(News.TYPE_NEWS_ACTUAL);
+                List<String> listImage = new ArrayList<>();
+                listImage.add(newsimg);
+                news.setCoverImage(listImage);
+                news.setTitle(name);
+                news.setSummary(newszy);
+                news.setSourceUrl(newslink);
+                news.setCleanedContent(content);
+                news.setOriginalContent(content);
+                page.putField("model", news);
             } else {
                 // 无详情界面
-                page.putField("newstitle", newstitle);
-                page.putField("newsimg", newsimg);
-                page.putField("newszy", newszy);
-                page.putField("newstime", newstime);
-                page.putField("newslink", newslink);
-                page.putField("code", CODE_FAIL);
+                News news = new News();
+                news.setNewsTime(newstime);
+                news.setNewsType(News.TYPE_NEWS_ACTUAL);
+                List<String> listImage = new ArrayList<>();
+                listImage.add(newsimg);
+                news.setCoverImage(listImage);
+                news.setTitle(newstitle);
+                news.setSummary(newszy);
+                page.putField("model", news);
             }
 
         }

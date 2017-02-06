@@ -66,7 +66,6 @@ public class SoundNewsProcessor implements PageProcessor {
                     String time = news.get("createtime");
 
                     Request request = new Request(getRealUrl(FORMAT_CONTENT_URL, newsid));
-                    request.putExtra("newsid", newsid);
                     request.putExtra("newstitle", newstitle);
                     request.putExtra("newsurl", newsurl);
                     request.putExtra("imgurl", imgurl);
@@ -81,7 +80,6 @@ public class SoundNewsProcessor implements PageProcessor {
         } else {
             // 内容界面
             Request request = page.getRequest();
-            String newsid = request.getExtra("newsid").toString();
             String newstitle = request.getExtra("newstitle").toString();
             String newsurl = request.getExtra("newsurl").toString();
             String imgurl = request.getExtra("imgurl").toString();
