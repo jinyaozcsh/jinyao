@@ -1,16 +1,19 @@
 package cn.swao.jinyao.crawl.special;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.poi.openxml4j.opc.internal.unmarshallers.PackagePropertiesUnmarshaller;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.beust.jcommander.Strings;
 
-import cn.swao.jinyao.pipeline.MongondbPipeline;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -31,8 +34,6 @@ import us.codecraft.webmagic.processor.PageProcessor;
  */
 @Service
 public class ActualNewsProcessor implements PageProcessor {
-
-    private MongondbPipeline mongondbPipeline = null;
 
     // Json数据入口
     public static final String START_URL = "http://www.eastday.com/eastday/shouye/node670813/sst/index_T901.html";
@@ -59,6 +60,7 @@ public class ActualNewsProcessor implements PageProcessor {
             // 解析json
             JSONObject jsonObject = new JSONObject(page.getJson().get());
             JSONArray jsonArray = jsonObject.getJSONArray("newslist");
+            List<Hashtable<Object, Object>> list = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject newsJsonObjcet = jsonArray.getJSONObject(i);
                 String newstitle = newsJsonObjcet.getString("newstitle");
@@ -84,10 +86,10 @@ public class ActualNewsProcessor implements PageProcessor {
                     table.put("newszy", newszy);
                     table.put("newstime", newstime);
                     table.put("code", CODE_FAIL);
-                    mongondbPipeline.save("ActualNewsProcessor", table);
+                    list.add(table);
                 }
             }
-            page.setSkip(true);
+            page.putField("list", list);
         } else {
             // 获取额外数据
             Request request = page.getRequest();
@@ -105,27 +107,23 @@ public class ActualNewsProcessor implements PageProcessor {
                 content = addImgPrefix(IMG_PREFIX, content);
                 String name = dataObject.getString("name");
                 String date = dataObject.getString("date");
-                Hashtable<Object, Object> table = new Hashtable<Object, Object>();
-                table.put("newstitle", newstitle);
-                table.put("newsimg", newsimg);
-                table.put("newszy", newszy);
-                table.put("newstime", newstime);
-                table.put("newslink", newslink);
-                table.put("name", name);
-                table.put("content", content);
-                table.put("date", date);
-                table.put("code", CODE_SUCCESS);
-                mongondbPipeline.save("ActualNewsProcessor", table);
+                page.putField("newstitle", newstitle);
+                page.putField("newsimg", newsimg);
+                page.putField("newszy", newszy);
+                page.putField("newstime", newstime);
+                page.putField("newslink", newslink);
+                page.putField("name", name);
+                page.putField("content", content);
+                page.putField("date", date);
+                page.putField("code", CODE_SUCCESS);
             } else {
                 // 无详情界面
-                Hashtable<Object, Object> table = new Hashtable<Object, Object>();
-                table.put("newstitle", newstitle);
-                table.put("newsimg", newsimg);
-                table.put("newszy", newszy);
-                table.put("newstime", newstime);
-                table.put("newslink", newslink);
-                table.put("code", CODE_FAIL);
-                mongondbPipeline.save("ActualNewsProcessor", table);
+                page.putField("newstitle", newstitle);
+                page.putField("newsimg", newsimg);
+                page.putField("newszy", newszy);
+                page.putField("newstime", newstime);
+                page.putField("newslink", newslink);
+                page.putField("code", CODE_FAIL);
             }
 
         }
@@ -155,13 +153,5 @@ public class ActualNewsProcessor implements PageProcessor {
             }
         }
         return result;
-    }
-
-    public MongondbPipeline getMongondbPipeline() {
-        return mongondbPipeline;
-    }
-
-    public void setMongondbPipeline(MongondbPipeline mongondbPipeline) {
-        this.mongondbPipeline = mongondbPipeline;
     }
 }

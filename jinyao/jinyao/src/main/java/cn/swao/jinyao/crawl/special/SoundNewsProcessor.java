@@ -1,15 +1,14 @@
 package cn.swao.jinyao.crawl.special;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.netty.channel.SucceededChannelFuture;
 import org.springframework.stereotype.Service;
 
 import cn.swao.framework.api.CustomBizException;
 import cn.swao.framework.util.WebUtils;
-import cn.swao.jinyao.pipeline.MongondbPipeline;
+import cn.swao.jinyao.model.News;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -22,8 +21,6 @@ import us.codecraft.webmagic.processor.PageProcessor;
  */
 @Service
 public class SoundNewsProcessor implements PageProcessor {
-
-    private MongondbPipeline mongondbPipeline = null;
 
     // Json数据入口
     public static final String START_URL = "http://listen.eastday.com/node2/node3/n1416/index1416_t81.html";
@@ -66,6 +63,7 @@ public class SoundNewsProcessor implements PageProcessor {
                     String newsurl = getRealUrl(FORMAT_URL, news.get("newstitle"));
                     String imgurl = getRealUrl(FORMAT_URL, news.get("imgurl1"));
                     String source = news.get("source");
+                    String time = news.get("createtime");
 
                     Request request = new Request(getRealUrl(FORMAT_CONTENT_URL, newsid));
                     request.putExtra("newsid", newsid);
@@ -73,6 +71,7 @@ public class SoundNewsProcessor implements PageProcessor {
                     request.putExtra("newsurl", newsurl);
                     request.putExtra("imgurl", imgurl);
                     request.putExtra("source", source);
+                    request.putExtra("time", time);
                     page.addTargetRequest(request);
                 });
 
@@ -87,26 +86,29 @@ public class SoundNewsProcessor implements PageProcessor {
             String newsurl = request.getExtra("newsurl").toString();
             String imgurl = request.getExtra("imgurl").toString();
             String source = request.getExtra("source").toString();
+            String time = request.getExtra("time").toString();
             String jsonString = page.getJson().get();
             try {
                 Map map = WebUtils.getJsonParams(jsonString);
                 int code = Integer.parseInt(map.get("Code").toString());
                 if (code == CODE_SUCCESS) {
                     Map<String, String> data = (Map<String, String>) map.get("Data");
-                    String name = data.get("name");
                     String audio = data.get("audio");
                     String content = data.get("content");
-                    Hashtable<Object, Object> table = new Hashtable<>();
-                    table.put("newsid", newsid);
-                    table.put("newstitle", newstitle);
-                    table.put("newsurl", newsurl);
-                    table.put("imgurl", imgurl);
-                    table.put("source", source);
-                    table.put("Code", code);
-                    table.put("name", name);
-                    table.put("audio", audio);
-                    table.put("content", content);
-                    mongondbPipeline.save("SoundNewsProcessor", table);
+                    List<String> imageList = new ArrayList<>();
+                    imageList.add(imgurl);
+                    News news = new News();
+                    news.setNewsType(News.TYPE_NEWS_SOUND);
+                    news.setMediaType(News.TYPE_MEDIA_AUDIO);
+                    news.setTitle(newstitle);
+                    news.setCoverImage(imageList);
+                    news.setOriginalContent(content);
+                    news.setCleanedContent(content);
+                    news.setSourceUrl(newsurl);
+                    news.setMediaSourceUrl(audio);
+                    news.setPublisher(source);
+                    news.setNewsTime(time);
+                    page.putField("model", news);
                 } else {
                     new CustomBizException("获取数据错误");
                 }
@@ -123,13 +125,5 @@ public class SoundNewsProcessor implements PageProcessor {
 
     private String getRealUrl(String format, Object arg) {
         return String.format(format, arg);
-    }
-
-    public MongondbPipeline getMongondbPipeline() {
-        return mongondbPipeline;
-    }
-
-    public void setMongondbPipeline(MongondbPipeline mongondbPipeline) {
-        this.mongondbPipeline = mongondbPipeline;
     }
 }

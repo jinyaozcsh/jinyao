@@ -1,16 +1,14 @@
 package cn.swao.jinyao.crawl.special;
 
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.ArrayUtils;
-import cn.swao.baselib.util.DateUtils;
 import cn.swao.framework.util.WebUtils;
-import cn.swao.jinyao.pipeline.MongondbPipeline;
+import cn.swao.jinyao.model.Activity;
 import cn.swao.jinyao.util.DataUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
@@ -25,8 +23,6 @@ import us.codecraft.webmagic.processor.PageProcessor;
  */
 @Service
 public class CommunityActivityProcessor implements PageProcessor {
-
-    private MongondbPipeline mongondbPipeline = null;
 
     // 启动url
     public static final String START_URL = "http://www.wenhuayun.cn/frontIndex/activityQueryList.do";
@@ -71,7 +67,6 @@ public class CommunityActivityProcessor implements PageProcessor {
                             String activityArea = ArrayUtils.getMapString(info, "activityArea");
                             String activityStartTime = ArrayUtils.getMapString(info, "activityStartTime");
                             String activityName = ArrayUtils.getMapString(info, "activityName");
-                            String activitySite = ArrayUtils.getMapString(info, "activitySite");
                             String activityIconUrl = getRealUrl(FORMAT_IMG_URL, ArrayUtils.getMapString(info, "activityIconUrl"));
                             String activityId = ArrayUtils.getMapString(info, "activityId");
                             String activityEndTime = ArrayUtils.getMapString(info, "activityEndTime");
@@ -85,13 +80,11 @@ public class CommunityActivityProcessor implements PageProcessor {
                                 request.putExtra("activityIconUrl", activityIconUrl);
                                 request.putExtra("activityId", activityId);
                                 request.putExtra("activityName", activityName);
-                                request.putExtra("activitySite", activitySite);
                                 request.putExtra("activityStartTime", activityStartTime);
                                 request.putExtra("activityEndTime", activityEndTime);
                                 page.addTargetRequest(request);
                             } else {
                                 isEnd = true;
-                                System.err.println("没有更多" + DateUtils.toDateString(new Date(activityUpdateTime)));
                             }
                         });
                     }
@@ -108,31 +101,25 @@ public class CommunityActivityProcessor implements PageProcessor {
                 Object activityName = request.getExtra("activityName");
                 Object activityStartTime = request.getExtra("activityStartTime");
                 Object activityEndTime = request.getExtra("activityEndTime");
-                Object activitySite = request.getExtra("activitySite");
                 String activityUrl = page.getUrl().get();
 
                 // 解析内容页面
                 String phone = page.getHtml().xpath("//*[@id='allInfo']//p[@class='phone']/span/text()").get();
                 String content = page.getHtml().xpath("//*[@id='allInfo']//div[@class='ad_intro']/html()").get();
-                Hashtable<Object, Object> table = new Hashtable<>();
-                table.put("activityAddress", activityAddress);
-                table.put("activityName", activityName);
-                table.put("activityArea", activityArea);
-                table.put("activityIconUrl", activityIconUrl);
-                table.put("activityId", activityId);
-                table.put("activityStartTime", activityStartTime);
-                // 可能为空
-                if (activityEndTime != null) {
-                    table.put("activityEndTime", activityEndTime);
-                }
-                if (activitySite != null) {
-                    table.put("activitySite", activitySite);
-                }
-                table.put("activityUrl", activityUrl);
-                table.put("phone", phone);
-                table.put("content", content);
-                // this.saveCallBack.communityActivitysvae(table);
-                mongondbPipeline.save("CommunityActivityProcessor", table);
+                Activity activity = new Activity();
+                activity.setId((String) activityId);
+                activity.setTitle((String) activityName);
+                activity.setAddress((String) activityAddress);
+                activity.setBeginTime((String) activityStartTime);
+                activity.setEndTime((String) activityEndTime);
+                activity.setCoverImage((String) activityIconUrl);
+                activity.setOriginalContent(content);
+                activity.setCleanedContent(content);
+                activity.setPhone(phone);
+                activity.setSourceUrl(activityUrl);
+                activity.setRegion((String)activityArea);
+                activity.setType(Activity.TYPE_COMMUNITY);
+                page.putField("model", activity);
             }
         }
     }
@@ -152,13 +139,5 @@ public class CommunityActivityProcessor implements PageProcessor {
 
     public void setDay(int day) {
         this.day = day;
-    }
-
-    public MongondbPipeline getMongondbPipeline() {
-        return mongondbPipeline;
-    }
-
-    public void setMongondbPipeline(MongondbPipeline mongondbPipeline) {
-        this.mongondbPipeline = mongondbPipeline;
     }
 }
