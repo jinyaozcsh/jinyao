@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.beust.jcommander.Strings;
 
+import cn.swao.jinyao.pipeline.MongondbPipeline;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -31,8 +32,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 @Service
 public class ActualNewsProcessor implements PageProcessor {
 
-    // 保存回调接口
-    public IActualNewsSave saveCallBack = null;
+    private MongondbPipeline mongondbPipeline = null;
 
     // Json数据入口
     public static final String START_URL = "http://www.eastday.com/eastday/shouye/node670813/sst/index_T901.html";
@@ -78,13 +78,13 @@ public class ActualNewsProcessor implements PageProcessor {
                 } else {
                     // 新闻链接为空
                     // 直接保存当前的属性
-                    Hashtable<String, Object> table = new Hashtable<String, Object>();
+                    Hashtable<Object, Object> table = new Hashtable<Object, Object>();
                     table.put("newstitle", newstitle);
                     table.put("newsimg", newsimg);
                     table.put("newszy", newszy);
                     table.put("newstime", newstime);
                     table.put("code", CODE_FAIL);
-                    saveCallBack.actualNewsSave(table);
+                    mongondbPipeline.save("ActualNewsProcessor", table);
                 }
             }
             page.setSkip(true);
@@ -105,7 +105,7 @@ public class ActualNewsProcessor implements PageProcessor {
                 content = addImgPrefix(IMG_PREFIX, content);
                 String name = dataObject.getString("name");
                 String date = dataObject.getString("date");
-                Hashtable<String, Object> table = new Hashtable<String, Object>();
+                Hashtable<Object, Object> table = new Hashtable<Object, Object>();
                 table.put("newstitle", newstitle);
                 table.put("newsimg", newsimg);
                 table.put("newszy", newszy);
@@ -115,17 +115,17 @@ public class ActualNewsProcessor implements PageProcessor {
                 table.put("content", content);
                 table.put("date", date);
                 table.put("code", CODE_SUCCESS);
-                saveCallBack.actualNewsSave(table);
+                mongondbPipeline.save("ActualNewsProcessor", table);
             } else {
                 // 无详情界面
-                Hashtable<String, Object> table = new Hashtable<String, Object>();
+                Hashtable<Object, Object> table = new Hashtable<Object, Object>();
                 table.put("newstitle", newstitle);
                 table.put("newsimg", newsimg);
                 table.put("newszy", newszy);
                 table.put("newstime", newstime);
                 table.put("newslink", newslink);
                 table.put("code", CODE_FAIL);
-                saveCallBack.actualNewsSave(table);
+                mongondbPipeline.save("ActualNewsProcessor", table);
             }
 
         }
@@ -157,11 +157,11 @@ public class ActualNewsProcessor implements PageProcessor {
         return result;
     }
 
-    public interface IActualNewsSave {
-        void actualNewsSave(Hashtable<String, Object> table);
+    public MongondbPipeline getMongondbPipeline() {
+        return mongondbPipeline;
     }
 
-    public void setSaveCallBack(IActualNewsSave saveCallBack) {
-        this.saveCallBack = saveCallBack;
+    public void setMongondbPipeline(MongondbPipeline mongondbPipeline) {
+        this.mongondbPipeline = mongondbPipeline;
     }
 }

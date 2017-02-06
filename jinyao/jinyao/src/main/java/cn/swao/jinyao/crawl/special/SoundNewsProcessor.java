@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import cn.swao.framework.api.CustomBizException;
 import cn.swao.framework.util.WebUtils;
+import cn.swao.jinyao.pipeline.MongondbPipeline;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -22,8 +23,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 @Service
 public class SoundNewsProcessor implements PageProcessor {
 
-    // 保存回调接口
-    public ISoundNewsSave saveCallBack = null;
+    private MongondbPipeline mongondbPipeline = null;
 
     // Json数据入口
     public static final String START_URL = "http://listen.eastday.com/node2/node3/n1416/index1416_t81.html";
@@ -96,7 +96,7 @@ public class SoundNewsProcessor implements PageProcessor {
                     String name = data.get("name");
                     String audio = data.get("audio");
                     String content = data.get("content");
-                    Hashtable<String, Object> table = new Hashtable<>();
+                    Hashtable<Object, Object> table = new Hashtable<>();
                     table.put("newsid", newsid);
                     table.put("newstitle", newstitle);
                     table.put("newsurl", newsurl);
@@ -106,7 +106,7 @@ public class SoundNewsProcessor implements PageProcessor {
                     table.put("name", name);
                     table.put("audio", audio);
                     table.put("content", content);
-                    saveCallBack.soundNewsSave(table);
+                    mongondbPipeline.save("SoundNewsProcessor", table);
                 } else {
                     new CustomBizException("获取数据错误");
                 }
@@ -125,11 +125,11 @@ public class SoundNewsProcessor implements PageProcessor {
         return String.format(format, arg);
     }
 
-    public interface ISoundNewsSave {
-        void soundNewsSave(Hashtable<String, Object> table);
+    public MongondbPipeline getMongondbPipeline() {
+        return mongondbPipeline;
     }
 
-    public void setSaveCallBack(ISoundNewsSave saveCallBack) {
-        this.saveCallBack = saveCallBack;
+    public void setMongondbPipeline(MongondbPipeline mongondbPipeline) {
+        this.mongondbPipeline = mongondbPipeline;
     }
 }

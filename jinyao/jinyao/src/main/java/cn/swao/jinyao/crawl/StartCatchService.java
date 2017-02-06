@@ -1,22 +1,17 @@
 package cn.swao.jinyao.crawl;
 
 import java.util.Hashtable;
-import java.util.Map;
 
-import javax.sound.midi.SysexMessage;
+import javax.annotation.PostConstruct;
 
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.JSONUtils;
-import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.crawl.special.ActualNewsProcessor;
-import cn.swao.jinyao.crawl.special.ActualNewsProcessor.IActualNewsSave;
 import cn.swao.jinyao.crawl.special.CommunityActivityProcessor;
-import cn.swao.jinyao.crawl.special.CommunityActivityProcessor.ICommunityActivitySave;
 import cn.swao.jinyao.crawl.special.SoundNewsProcessor;
-import cn.swao.jinyao.crawl.special.SoundNewsProcessor.ISoundNewsSave;
+import cn.swao.jinyao.pipeline.MongondbPipeline;
 import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.Spider;
 
@@ -27,7 +22,7 @@ import us.codecraft.webmagic.Spider;
  * @desc desc:爬虫启动类
  */
 @Service
-public class StartCatchService implements IActualNewsSave, ISoundNewsSave, ICommunityActivitySave {
+public class StartCatchService implements MongondbPipeline {
 
     @Autowired
     private ActualNewsProcessor actualNewsProcessor;
@@ -38,90 +33,55 @@ public class StartCatchService implements IActualNewsSave, ISoundNewsSave, IComm
     @Autowired
     private CommunityActivityProcessor communityActivityProcessor;
 
-    @Test
-    public void test() {
-        // startActualNews();
-        // startSoundNews();
-        startCommunityActivity();
+    @PostConstruct
+    public void setPipeline() {
+        actualNewsProcessor.setMongondbPipeline(this);
+        communityActivityProcessor.setMongondbPipeline(this);
+        communityActivityProcessor.setMongondbPipeline(this);
     }
 
     /**
      * 启动实时新闻抓爬
      */
     public void startActualNews() {
-        ActualNewsProcessor actualNewsProcessor = new ActualNewsProcessor();
-        actualNewsProcessor.setSaveCallBack(this);
-        Spider.create(actualNewsProcessor).addUrl(ActualNewsProcessor.START_URL).run();
-        // Spider spider = Spider.create(actualNewsProcessor);
-        // spider.addUrl(ActualNewsProcessor.START_URL);
-        // spider.start();
-
+        Spider spider = Spider.create(actualNewsProcessor);
+        spider.addUrl(ActualNewsProcessor.START_URL);
+        spider.run();
     }
 
     /**
      * 启动语音新闻抓爬
      */
     public void startSoundNews() {
-        SoundNewsProcessor soundNewsProcessor = new SoundNewsProcessor();
-        soundNewsProcessor.setSaveCallBack(this);
-        Spider.create(soundNewsProcessor).addUrl(SoundNewsProcessor.START_URL).run();
-        // Spider spider = Spider.create(soundNewsProcessor);
-        // spider.addUrl(SoundNewsProcessor.START_URL);
-        // spider.start();
-
+        Spider spider = Spider.create(soundNewsProcessor);
+        spider.addUrl(SoundNewsProcessor.START_URL);
+        spider.run();
     }
 
     /**
      * 启动社区新闻抓爬
      */
     public void startCommunityActivity() {
-        CommunityActivityProcessor communityActivityProcessor = new CommunityActivityProcessor();
-        communityActivityProcessor.setSaveCallBack(this);
-        Spider.create(communityActivityProcessor).thread(10).addUrl(CommunityActivityProcessor.START_URL).run();
-        // Spider spider = Spider.create(soundNewsProcessor);
-        // spider.addUrl(SoundNewsProcessor.START_URL);
-        // spider.start();
-
+        communityActivityProcessor.setDay(1);
+        Spider spider = Spider.create(communityActivityProcessor);
+        spider.addUrl(CommunityActivityProcessor.START_URL);
+        spider.thread(10).run();
     }
 
-    /**
-     * 实时新闻保存回调
-     */
     @Override
-    public void actualNewsSave(Hashtable<String, Object> table) {
-        for (Map.Entry<String, Object> entry : table.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            System.out.println(key + " == " + value);
+    public synchronized void save(String className, Hashtable<Object, Object> table) {
+        switch (className) {
+        case "CommunityActivityProcessor":
+            FileUtils.putFile("D:CommunityActivityProcessor.txt", JSONUtils.toJson(table));
+            break;
+        case "SoundNewsProcessor":
+            FileUtils.putFile("D:SoundNewsProcessor.txt", JSONUtils.toJson(table));
+            break;
+        case "ActualNewsProcessor":
+            FileUtils.putFile("D:ActualNewsProcessor.txt", JSONUtils.toJson(table));
+            break;
+        default:
+            break;
         }
-
-        System.out.println("===============");
-        // System.out.println(code);
-        // System.out.println(newslink);
-        // System.out.println(newstitle);
-        // System.out.println(newsimg);
-        // System.out.println(newszy);
-        // System.out.println(newstime);
-        // System.out.println(name);
-        // System.out.println(content);
-        // System.out.println(date);
-        // System.out.println("=================");
-    }
-
-    /**
-     * 语音新闻保存回调
-     */
-    @Override
-    public void soundNewsSave(Hashtable<String, Object> table) {
-        actualNewsSave(table);
-    }
-
-    /**
-     * 社区活动新闻保存回调
-     */
-    @Override
-    public void communityActivitysvae(Hashtable<String, Object> table) {
-        // actualNewsSave(table);
-        FileUtils.putFile("D:shequ111.txt", JSONUtils.toJson(table));
     }
 }

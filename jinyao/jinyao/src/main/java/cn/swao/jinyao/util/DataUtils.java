@@ -39,14 +39,6 @@ public class DataUtils {
      * @return
      */
     public static boolean isWithinTheDateRange(Date date, Date dataDate, int day) {
-        // 当前日期的天的时间戳
-        long dayTimeStamp = date.getTime() / (60 * 60 * 24 *1000);
-        // 数据天的时间戳
-        long timeStamp = dataDate.getTime() / (60 * 60 * 24*1000);
-        if (timeStamp >= dayTimeStamp - day) {
-            return true;
-        } else {
-            return false;
-        }
+        return isWithinTheDateRange(date,dataDate.getTime(),day);
     }
 }

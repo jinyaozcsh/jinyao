@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.Component;
 
 import cn.swao.baselib.util.DateUtils;
+import cn.swao.jinyao.crawl.StartCatchService;
 import cn.swao.jinyao.crawl.special.*;
 import us.codecraft.webmagic.Spider;
 
@@ -18,6 +19,8 @@ import us.codecraft.webmagic.Spider;
 public class TaskScheduler {
     private static Logger log = LoggerFactory.getLogger(TaskScheduler.class);
 
+    @Autowired
+    private StartCatchService startCatchService;
     @Autowired
     private CommuntiyNewsProcessor communtiyNewsProcessor;
     @Autowired
@@ -55,5 +58,20 @@ public class TaskScheduler {
         }
         System.setProperty("javax.net.ssl.trustStore", file.getAbsolutePath());
         Spider.create(new RedianProcessor()).addUrl(redianProcessor.url).thread(5).run();
+    }
+    
+    @Scheduled(cron = "0 59 * * * ?")
+    public void catchSoundNews() {
+        startCatchService.startSoundNews();
+    }
+
+    @Scheduled(cron = "0 59 * * * ?")
+    public void catchActualNews() throws Exception {
+       startCatchService.startActualNews();
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?") // 每天2am
+    public void catchCommunityActivity() throws Exception {
+       startCatchService.startCommunityActivity();
     }
 }

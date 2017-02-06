@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import cn.swao.baselib.util.ArrayUtils;
 import cn.swao.baselib.util.DateUtils;
 import cn.swao.framework.util.WebUtils;
+import cn.swao.jinyao.pipeline.MongondbPipeline;
 import cn.swao.jinyao.util.DataUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
@@ -20,12 +21,12 @@ import us.codecraft.webmagic.processor.PageProcessor;
  * 
  * @author ShenJX
  * @date 2017年1月18日
- * @desc 社区活动抓去
+ * @desc 社区活动抓取
  */
 @Service
 public class CommunityActivityProcessor implements PageProcessor {
 
-    private ICommunityActivitySave saveCallBack = null;
+    private MongondbPipeline mongondbPipeline = null;
 
     // 启动url
     public static final String START_URL = "http://www.wenhuayun.cn/frontIndex/activityQueryList.do";
@@ -113,7 +114,7 @@ public class CommunityActivityProcessor implements PageProcessor {
                 // 解析内容页面
                 String phone = page.getHtml().xpath("//*[@id='allInfo']//p[@class='phone']/span/text()").get();
                 String content = page.getHtml().xpath("//*[@id='allInfo']//div[@class='ad_intro']/html()").get();
-                Hashtable<String, Object> table = new Hashtable<>();
+                Hashtable<Object, Object> table = new Hashtable<>();
                 table.put("activityAddress", activityAddress);
                 table.put("activityName", activityName);
                 table.put("activityArea", activityArea);
@@ -130,7 +131,8 @@ public class CommunityActivityProcessor implements PageProcessor {
                 table.put("activityUrl", activityUrl);
                 table.put("phone", phone);
                 table.put("content", content);
-                this.saveCallBack.communityActivitysvae(table);
+                // this.saveCallBack.communityActivitysvae(table);
+                mongondbPipeline.save("CommunityActivityProcessor", table);
             }
         }
     }
@@ -144,19 +146,19 @@ public class CommunityActivityProcessor implements PageProcessor {
         return String.format(format, arg);
     }
 
-    public interface ICommunityActivitySave {
-        void communityActivitysvae(Hashtable<String, Object> table);
-    }
-
-    public void setSaveCallBack(ICommunityActivitySave saveCallBack) {
-        this.saveCallBack = saveCallBack;
-    }
-
     public int getDay() {
         return day;
     }
 
     public void setDay(int day) {
         this.day = day;
+    }
+
+    public MongondbPipeline getMongondbPipeline() {
+        return mongondbPipeline;
+    }
+
+    public void setMongondbPipeline(MongondbPipeline mongondbPipeline) {
+        this.mongondbPipeline = mongondbPipeline;
     }
 }
