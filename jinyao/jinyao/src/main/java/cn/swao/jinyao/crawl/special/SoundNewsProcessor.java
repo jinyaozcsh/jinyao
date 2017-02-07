@@ -60,7 +60,7 @@ public class SoundNewsProcessor implements PageProcessor {
                 list.forEach(news -> {
                     String newsid = news.get("newsid");
                     String newstitle = news.get("newstitle");
-                    String newsurl = getRealUrl(FORMAT_URL, news.get("newstitle"));
+                    String newsurl = getRealUrl(FORMAT_URL, news.get("newsurl"));
                     String imgurl = getRealUrl(FORMAT_URL, news.get("imgurl1"));
                     String source = news.get("source");
                     String time = news.get("createtime");
@@ -77,6 +77,7 @@ public class SoundNewsProcessor implements PageProcessor {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            page.setSkip(true);
         } else {
             // 内容界面
             Request request = page.getRequest();

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.ArrayUtils;
@@ -13,6 +14,7 @@ import cn.swao.jinyao.util.DataUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
+import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 /**
@@ -84,6 +86,7 @@ public class CommunityActivityProcessor implements PageProcessor {
                                 request.putExtra("activityEndTime", activityEndTime);
                                 page.addTargetRequest(request);
                             } else {
+                                page.setSkip(true);
                                 isEnd = true;
                             }
                         });
@@ -97,7 +100,7 @@ public class CommunityActivityProcessor implements PageProcessor {
                 Object activityAddress = request.getExtra("activityAddress");
                 Object activityArea = request.getExtra("activityArea");
                 Object activityIconUrl = request.getExtra("activityIconUrl");
-                Object activityId = request.getExtra("activityId");
+                // Object activityId = request.getExtra("activityId");
                 Object activityName = request.getExtra("activityName");
                 Object activityStartTime = request.getExtra("activityStartTime");
                 Object activityEndTime = request.getExtra("activityEndTime");
@@ -107,21 +110,28 @@ public class CommunityActivityProcessor implements PageProcessor {
                 String phone = page.getHtml().xpath("//*[@id='allInfo']//p[@class='phone']/span/text()").get();
                 String content = page.getHtml().xpath("//*[@id='allInfo']//div[@class='ad_intro']/html()").get();
                 Activity activity = new Activity();
-                activity.setId((String) activityId);
                 activity.setTitle((String) activityName);
                 activity.setAddress((String) activityAddress);
                 activity.setBeginTime((String) activityStartTime);
                 activity.setEndTime((String) activityEndTime);
-                activity.setCoverImage((String) activityIconUrl);
+                activity.setCoverImage(getImageUrl((String) activityIconUrl));
                 activity.setOriginalContent(content);
                 activity.setCleanedContent(content);
                 activity.setPhone(phone);
                 activity.setSourceUrl(activityUrl);
-                activity.setRegion((String)activityArea);
+                activity.setRegion((String) activityArea);
                 activity.setType(Activity.TYPE_COMMUNITY);
                 page.putField("model", activity);
             }
         }
+    }
+
+    // 图片403
+    public static String getImageUrl(String imgUrl) {
+        int index = imgUrl.lastIndexOf(".");
+        String suffix = imgUrl.substring(index, imgUrl.length());
+        String prefix = imgUrl.substring(0, index);
+        return prefix + "_300_300" + suffix;
     }
 
     @Override

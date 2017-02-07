@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.*;
 import cn.swao.jinyao.crawl.special.*;
+import cn.swao.jinyao.model.Activity;
 import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.pipeline.MongodbPipeline;
 import cn.swao.jinyao.repository.*;
@@ -53,7 +54,7 @@ public class StartCatchService {
     public void startActualNews() {
         Spider spider = Spider.create(actualNewsProcessor);
         spider.addUrl(ActualNewsProcessor.START_URL);
-        spider.addPipeline(new MongodbPipeline());
+        spider.addPipeline(new MongodbPipeline<NewsRepository, News>(newsRepository));
         spider.run();
     }
 
@@ -63,7 +64,7 @@ public class StartCatchService {
     public void startSoundNews() {
         Spider spider = Spider.create(soundNewsProcessor);
         spider.addUrl(SoundNewsProcessor.START_URL);
-        spider.addPipeline(new MongodbPipeline());
+        spider.addPipeline(new MongodbPipeline<NewsRepository, News>(newsRepository));
         spider.run();
     }
 
@@ -74,7 +75,7 @@ public class StartCatchService {
         communityActivityProcessor.setDay(1);
         Spider spider = Spider.create(communityActivityProcessor);
         spider.addUrl(CommunityActivityProcessor.START_URL);
-        spider.addPipeline(new MongodbPipeline());
+        spider.addPipeline(new MongodbPipeline<ActivityRepository, Activity>(activityRepository));
         spider.thread(10).run();
     }
 

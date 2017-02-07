@@ -58,41 +58,45 @@ public class ActualNewsProcessor implements PageProcessor {
     @Override
     public void process(Page page) {
         if (page.getUrl().get().equals(START_URL)) {
-            // 解析json
-            JSONObject jsonObject = new JSONObject(page.getJson().get());
-            JSONArray jsonArray = jsonObject.getJSONArray("newslist");
-            List<News> list = new ArrayList<>();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject newsJsonObjcet = jsonArray.getJSONObject(i);
-                String newstitle = newsJsonObjcet.getString("newstitle");
-                String newsimg = newsJsonObjcet.getString("newsimg");
-                String newszy = newsJsonObjcet.getString("newszy");
-                String newslink = newsJsonObjcet.getString("newslink");
-                String newstime = newsJsonObjcet.getString("newstime");
-                // 内容界面不为空
-                if (!Strings.isStringEmpty(newslink)) {
-                    Request request = new Request(getContentUrl(newslink));
-                    request.putExtra("newstitle", newstitle);
-                    request.putExtra("newsimg", newsimg);
-                    request.putExtra("newszy", newszy);
-                    request.putExtra("newslink", newslink);
-                    request.putExtra("newstime", newstime);
-                    page.addTargetRequest(request);
-                } else {
-                    // 新闻链接为空
-                    // 直接保存当前的属性
-                    News news = new News();
-                    news.setNewsTime(newstime);
-                    news.setNewsType(News.TYPE_NEWS_ACTUAL);
-                    List<String> listImage = new ArrayList<>();
-                    listImage.add(newsimg);
-                    news.setCoverImage(listImage);
-                    news.setTitle(newstitle);
-                    news.setSummary(newszy);
-                    list.add(news);
+            try {
+                // 解析json
+                JSONObject jsonObject = new JSONObject(page.getJson().get().replace("\n", ""));
+                JSONArray jsonArray = jsonObject.getJSONArray("newslist");
+                List<News> list = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject newsJsonObjcet = jsonArray.getJSONObject(i);
+                    String newstitle = newsJsonObjcet.getString("newstitle");
+                    String newsimg = newsJsonObjcet.getString("newsimg");
+                    String newszy = newsJsonObjcet.getString("newszy");
+                    String newslink = newsJsonObjcet.getString("newslink");
+                    String newstime = newsJsonObjcet.getString("newstime");
+                    // 内容界面不为空
+                    if (!Strings.isStringEmpty(newslink)) {
+                        Request request = new Request(getContentUrl(newslink));
+                        request.putExtra("newstitle", newstitle);
+                        request.putExtra("newsimg", newsimg);
+                        request.putExtra("newszy", newszy);
+                        request.putExtra("newslink", newslink);
+                        request.putExtra("newstime", newstime);
+                        page.addTargetRequest(request);
+                    } else {
+                        // 新闻链接为空
+                        // 直接保存当前的属性
+                        News news = new News();
+                        news.setNewsTime(newstime);
+                        news.setNewsType(News.TYPE_NEWS_ACTUAL);
+                        List<String> listImage = new ArrayList<>();
+                        listImage.add(newsimg);
+                        news.setCoverImage(listImage);
+                        news.setTitle(newstitle);
+                        news.setSummary(newszy);
+                        list.add(news);
+                    }
                 }
+                page.putField("modle", list);
+            } catch (Exception e) {
+               e.printStackTrace();
             }
-            page.putField("modle", list);
         } else {
             // 获取额外数据
             Request request = page.getRequest();
@@ -110,7 +114,7 @@ public class ActualNewsProcessor implements PageProcessor {
                 content = addImgPrefix(IMG_PREFIX, content);
                 String name = dataObject.getString("name");
                 String date = dataObject.getString("date");
-                
+
                 News news = new News();
                 news.setNewsTime(date);
                 news.setNewsType(News.TYPE_NEWS_ACTUAL);
