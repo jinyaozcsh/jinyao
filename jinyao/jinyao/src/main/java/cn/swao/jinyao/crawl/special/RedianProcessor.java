@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.JSONUtils;
 import cn.swao.framework.util.WebUtils;
+import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.*;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -50,11 +51,13 @@ public class RedianProcessor implements PageProcessor {
                 request.putExtra("sourceUrl", sourceUrl);
                 request.putExtra("pushTime", pushTime);
                 request.putExtra("img", miniimg);
+                request.putExtra("source", source);
                 page.addTargetRequest(request);
             }
             if (rowkey != null) {
                 page.addTargetRequest(nexturl + rowkey);
             }
+            page.setSkip(true);
         } else {
             String str = page.getJson().removePadding("null").get();
             Map<String, Object> jsonParams = null;
@@ -64,20 +67,16 @@ public class RedianProcessor implements PageProcessor {
                 e.printStackTrace();
             }
             if (jsonParams != null && jsonParams.get("stat").toString().equals("1")) {
-                Map<String, Object> map = new HashMap<String, Object>();
                 Request request = page.getRequest();
                 String title = request.getExtra("title").toString();
                 String newsurl = request.getExtra("sourceUrl").toString();
                 String pushTime = request.getExtra("pushTime").toString();
+                String source = request.getExtra("source").toString();
                 List img = (List) request.getExtra("img");
                 Map<String, String> obj = (Map<String, String>) jsonParams.get("data");
                 String content = obj.get("content");
-                map.put("title", title);
-                map.put("sourceUrl", newsurl);
-                map.put("pushTime", pushTime);
-                map.put("img", img);
-                map.put("content", content);
-                FileUtils.putFile("D:/redian.txt", JSONUtils.toJson(map));
+                News news = new News(title, img, null, content, newsurl, null, "热点新闻", source, pushTime, new Date());
+                page.putField("model", news);
             }
         }
 

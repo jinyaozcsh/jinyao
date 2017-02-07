@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.JSONUtils;
 import cn.swao.framework.util.WebUtils;
+import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.*;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -59,7 +60,7 @@ public class QuxianProcessor implements PageProcessor {
                 }
             }
             page.addTargetRequest(jsonUrl);
-
+            page.setSkip(true);
         } else {
             String str = page.getJson().get();
             Map<String, Object> jsonParams = null;
@@ -69,7 +70,6 @@ public class QuxianProcessor implements PageProcessor {
                 e.printStackTrace();
             }
             if (jsonParams != null && jsonParams.get("Success").toString().equals("true")) {
-                Map<String, String> map = new HashMap<String, String>();
                 Request request = page.getRequest();
                 String title = request.getExtra("title").toString();
                 String newsurl = request.getExtra("newsurl").toString();
@@ -77,20 +77,13 @@ public class QuxianProcessor implements PageProcessor {
                 String img = request.getExtra("img").toString();
                 Map<String, String> obj = (Map<String, String>) jsonParams.get("Data");
                 String content = obj.get("content");
-                map.put("title", title);
-                map.put("sourceUrl", newsurl);
-                map.put("pushTime", pushTime);
-                map.put("img", img);
-                map.put("content", content);
-                map.put("type","quxian");
-                FileUtils.putFile("D:/Quxin.txt", JSONUtils.toJson(map));
+                ArrayList<String> list = new ArrayList<String>();
+                list.add(img);
+                News news = new News(title, list, null, content, newsurl, null, "区县新闻", "东方网", pushTime, new Date());
+                page.putField("model", news);
             }
         }
 
-    }
-
-    public static void main(String[] args) {
-        Spider.create(new QuxianProcessor()).addUrl("http://city.eastday.com/eastday/n1002826/n1004932/n1004933/n1007783/index_t1282.html").thread(5).run();
     }
 
 }

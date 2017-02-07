@@ -156,6 +156,24 @@ public class News {
         this.newsTime = newsTime;
     }
 
+    public News(String title, List<String> coverImage, String originalContent, String cleanedContent, String sourceUrl, String mediaType, String newsType, String publisher, String newsTime, Date createTime) {
+        super();
+        this.title = title;
+        this.coverImage = coverImage;
+        this.originalContent = originalContent;
+        this.cleanedContent = cleanedContent;
+        this.sourceUrl = sourceUrl;
+        this.mediaType = mediaType;
+        this.newsType = newsType;
+        this.publisher = publisher;
+        this.newsTime = newsTime;
+        this.createTime = createTime;
+    }
+
+    public News() {
+        super();
+    }
+
     @Override
     public String toString() {
         return "News [id=" + id + ", title=" + title + ", coverImage=" + coverImage + ", originalContent=" + originalContent + ", cleanedContent=" + cleanedContent + ", region=" + region + ", sourceUrl=" + sourceUrl + ", mediaType=" + mediaType + ", newsType=" + newsType + ", mediaSourceUrl=" + mediaSourceUrl + ", summary=" + summary + ", publisher=" + publisher + ", createTime=" + createTime + ", newsTime=" + newsTime + "]";

@@ -3,7 +3,7 @@ package cn.swao.jinyao.crawl.special;
 import java.util.*;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.jsoup.nodes.*;
 import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.swao.baselib.util.*;
+import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.util.*;
 import us.codecraft.webmagic.*;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -73,6 +74,7 @@ public class CommuntiyNewsProcessor implements PageProcessor {
                             page.addTargetRequest(request);
                         }
                     }
+                    page.setSkip(true);
                 } catch (Exception e) {
                     log.info("第" + i + "条" + "条报错", e);
                 }
@@ -80,9 +82,9 @@ public class CommuntiyNewsProcessor implements PageProcessor {
 
         } else {
             String content = null;
+            String originalContent = page.getRawText();
             try {
                 // content = page.getHtml().smartContent().get();
-
                 content = ContentExtractor.getContentElementByHtml(page.getRawText()).toString();
                 content = HtmlUtils.simplifyContent(content);
 
@@ -96,18 +98,26 @@ public class CommuntiyNewsProcessor implements PageProcessor {
                 String sourceUrl = request.getExtra("url").toString();
                 String title = request.getExtra("title").toString();
                 String name = request.getExtra("name").toString();
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("source", source);
-                map.put("pushTime", pushTime);
-                map.put("sourceUrl", sourceUrl);
-                map.put("title", title);
-                map.put("name", name);
-                map.put("content", content);
-                FileUtils.putFile("D:/communtiyNews.txt", JSONUtils.toJson(map));
-                System.out.println(JSONUtils.toJson(map));
+                ArrayList<String> list = new ArrayList<String>();
+                list.add(getImage(originalContent));
+                News news = new News(title, list, originalContent, content, sourceUrl, null, "社区新闻", source, pushTime, new Date());
+                news.setRegion(name);
+                page.putField("model", news);
+                log.info("第一："+news);
             }
         }
 
+    }
+
+    public String getImage(String html) {
+        Document doc = Jsoup.parse(html);
+        for (Element img : doc.select("img")) {
+            String tUrl = img.attr("src");
+            if (Strings.isNullOrEmpty(tUrl))
+                continue;
+            return img.absUrl("src");
+        }
+        return null;
     }
 
 }

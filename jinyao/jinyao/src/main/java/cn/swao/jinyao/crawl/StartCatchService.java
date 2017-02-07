@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.*;
 import cn.swao.jinyao.crawl.special.*;
-import cn.swao.jinyao.pipeline.MongondbPipeline;
+import cn.swao.jinyao.pipeline.MongodbPipeline;
 import cn.swao.jinyao.util.FileUtils;
 import us.codecraft.webmagic.Spider;
 
@@ -22,7 +22,7 @@ import us.codecraft.webmagic.Spider;
  * @desc desc:爬虫启动类
  */
 @Service
-public class StartCatchService{
+public class StartCatchService {
 
     private static Logger log = LoggerFactory.getLogger(StartCatchService.class);
 
@@ -38,16 +38,18 @@ public class StartCatchService{
     private QuxianProcessor quxianProcessor;
     @Autowired
     private RedianProcessor redianProcessor;
+    @Autowired
+    private MongodbPipeline mongodbPipeline;
     @Value("${swao.storage.path:}")
     public String path;
-    
+
     /**
      * 启动实时新闻抓爬
      */
     public void startActualNews() {
         Spider spider = Spider.create(actualNewsProcessor);
         spider.addUrl(ActualNewsProcessor.START_URL);
-        spider.addPipeline(new MongondbPipeline());
+        spider.addPipeline(new MongodbPipeline());
         spider.run();
     }
 
@@ -57,7 +59,7 @@ public class StartCatchService{
     public void startSoundNews() {
         Spider spider = Spider.create(soundNewsProcessor);
         spider.addUrl(SoundNewsProcessor.START_URL);
-        spider.addPipeline(new MongondbPipeline());
+        spider.addPipeline(new MongodbPipeline());
         spider.run();
     }
 
@@ -68,7 +70,7 @@ public class StartCatchService{
         communityActivityProcessor.setDay(1);
         Spider spider = Spider.create(communityActivityProcessor);
         spider.addUrl(CommunityActivityProcessor.START_URL);
-        spider.addPipeline(new MongondbPipeline());
+        spider.addPipeline(new MongodbPipeline());
         spider.thread(10).run();
     }
 
@@ -80,22 +82,19 @@ public class StartCatchService{
         for (String region : regions) {
             String format = String.format(communtiyNewsProcessor.url, region);
             // String format = String.format(url, "定海路街道");
-            Spider.create(communtiyNewsProcessor).addUrl(format).thread(5).run();
+            Spider.create(communtiyNewsProcessor).addPipeline(this.mongodbPipeline).addUrl(format).thread(5).run();
         }
     }
 
     public void catchQuxian() {
-        Spider.create(new QuxianProcessor()).addUrl(quxianProcessor.url).thread(5).run();
+        Spider.create(new QuxianProcessor()).addPipeline(this.mongodbPipeline).addUrl(quxianProcessor.url).thread(5).run();
     }
 
     public void catchRedian() throws Exception {
-        File file = new File(path, "jssecacerts");
-        if (!file.exists()) {
-            InstallCert.createCert(file, "newswifiapi.dftoutiao.com");
-            log.info("获取安全证书{}", file.getAbsolutePath());
-        }
-        System.setProperty("javax.net.ssl.trustStore", file.getAbsolutePath());
-        Spider.create(new RedianProcessor()).addUrl(redianProcessor.url).thread(5).run();
+        /*
+         * File file = new File(path, "jssecacerts"); if (!file.exists()) { InstallCert.createCert(file, "newswifiapi.dftoutiao.com"); log.info("获取安全证书{}", file.getAbsolutePath()); } System.setProperty("javax.net.ssl.trustStore", file.getAbsolutePath());
+         */
+        Spider.create(new RedianProcessor()).addPipeline(this.mongodbPipeline).addUrl(redianProcessor.url).thread(5).run();
     }
 
     public synchronized void save(String className, Hashtable<Object, Object> table) {
