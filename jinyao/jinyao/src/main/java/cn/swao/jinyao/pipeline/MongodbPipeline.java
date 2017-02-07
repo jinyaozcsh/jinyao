@@ -4,8 +4,11 @@ import java.util.*;
 
 import org.assertj.core.util.Strings;
 
+import cn.swao.jinyao.model.Activity;
 import cn.swao.jinyao.model.BaseCatch;
+import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.repository.BaseRepository;
+import cn.swao.jinyao.repository.NewsRepository;
 import us.codecraft.webmagic.*;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
@@ -41,13 +44,26 @@ public class MongodbPipeline<T extends BaseRepository<E>, E extends BaseCatch> i
         if (object instanceof BaseCatch) {
             E e = (E) object;
             e.setCreateTime(new Date());
-            String sourceUrl = e.getSourceUrl();
-            if (!Strings.isNullOrEmpty(sourceUrl) && this.baseRepository.findBySourceUrl(sourceUrl) == null) {
-                this.baseRepository.save(e);
+
+            if (object instanceof News) {
+                News news = (News) object;
+                if (news.getNewsType().equals(News.TYPE_NEWS_ACTUAL)) {
+                    String title = news.getTitle();
+                    if (!Strings.isNullOrEmpty(title)) {
+                        if (baseRepository instanceof NewsRepository) {
+                            NewsRepository newsRepository = (NewsRepository) baseRepository;
+                            if (newsRepository.findByTitle(title) == null) {
+                                newsRepository.save(news);
+                            }
+                        }
+                    }
+                }
+            } else {
+                String sourceUrl = e.getSourceUrl();
+                if (!Strings.isNullOrEmpty(sourceUrl) && this.baseRepository.findBySourceUrl(sourceUrl) == null) {
+                    this.baseRepository.save(e);
+                }
             }
         }
-        /*
-         * if (object instanceof Activity) { Activity activity = (Activity) object; if (!Strings.isNullOrEmpty(activity.getSourceUrl()) && this.activityRepository.findBySourceUrl(activity.getSourceUrl()) == null) { this.activityRepository.save(activity); } } else if (object instanceof News) { News news = (News) object; if (!Strings.isNullOrEmpty(news.getSourceUrl()) && this.newsRepository.findBySourceUrl(news.getSourceUrl()) == null) { this.newsRepository.save(news); } }
-         */
     }
 }

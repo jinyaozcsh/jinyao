@@ -6,4 +6,5 @@ import cn.swao.jinyao.model.News;
 
 @Repository
 public interface NewsRepository extends BaseRepository<News> {
+    News findByTitle(String title);
 }

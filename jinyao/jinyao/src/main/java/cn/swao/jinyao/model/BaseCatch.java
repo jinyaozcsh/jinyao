@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class BaseCatch {
 
-    public String sourceUrl;
+    protected String sourceUrl;
 
-    public Date createTime;
+    protected Date createTime;
 
     public String getSourceUrl() {
         return sourceUrl;
