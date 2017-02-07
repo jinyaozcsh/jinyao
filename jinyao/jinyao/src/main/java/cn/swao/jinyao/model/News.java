@@ -11,7 +11,7 @@ import org.springframework.data.annotation.Id;
  * @date 2017年2月6日
  * @desc 新闻模型
  */
-public class News {
+public class News extends BaseCatch {
     public static final String TYPE_NEWS_ACTUAL = "actual";
     public static final String TYPE_NEWS_SOUND = "sound";
 
@@ -28,8 +28,6 @@ public class News {
     private String cleanedContent;
     // 区域
     private String region;
-    // 新闻源链接
-    private String sourceUrl;
     // 媒体类型
     private String mediaType;
     // 新闻类型
@@ -40,7 +38,6 @@ public class News {
     private String summary;
     // 发布者
     private String publisher;
-    private Date createTime;
     // 新闻时间
     private String newsTime;
 
@@ -92,14 +89,6 @@ public class News {
         this.region = region;
     }
 
-    public String getSourceUrl() {
-        return sourceUrl;
-    }
-
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
-    }
-
     public String getMediaType() {
         return mediaType;
     }
@@ -140,14 +129,6 @@ public class News {
         this.publisher = publisher;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
     public String getNewsTime() {
         return newsTime;
     }
@@ -156,7 +137,7 @@ public class News {
         this.newsTime = newsTime;
     }
 
-    public News(String title, List<String> coverImage, String originalContent, String cleanedContent, String sourceUrl, String mediaType, String newsType, String publisher, String newsTime, Date createTime) {
+    public News(String title, List<String> coverImage, String originalContent, String cleanedContent, String sourceUrl, String mediaType, String newsType, String publisher, String newsTime) {
         super();
         this.title = title;
         this.coverImage = coverImage;
@@ -167,7 +148,6 @@ public class News {
         this.newsType = newsType;
         this.publisher = publisher;
         this.newsTime = newsTime;
-        this.createTime = createTime;
     }
 
     public News() {

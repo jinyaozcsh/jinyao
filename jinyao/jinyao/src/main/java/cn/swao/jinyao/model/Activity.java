@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
  * @date 2017年2月6日
  * @desc 活动模型
  */
-public class Activity {
+public class Activity extends BaseCatch {
 
     public static final String TYPE_COMMUNITY = "community";
 
@@ -19,7 +19,6 @@ public class Activity {
     private String endTime;
     private String coverImage;
     private String phone;
-    private String sourceUrl;
     private String type;
     private String region;
     // 原始内容
@@ -81,14 +80,6 @@ public class Activity {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getSourceUrl() {
-        return sourceUrl;
-    }
-
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
     }
 
     public String getType() {

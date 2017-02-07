@@ -1,17 +1,13 @@
 package cn.swao.jinyao.pipeline;
 
-import java.util.List;
+import java.util.*;
 
 import org.assertj.core.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import cn.swao.jinyao.model.Activity;
-import cn.swao.jinyao.model.News;
-import cn.swao.jinyao.repository.*;
-import us.codecraft.webmagic.ResultItems;
-import us.codecraft.webmagic.Task;
-import us.codecraft.webmagic.pipeline.*;
+import cn.swao.jinyao.model.BaseCatch;
+import cn.swao.jinyao.repository.BaseRepository;
+import us.codecraft.webmagic.*;
+import us.codecraft.webmagic.pipeline.Pipeline;
 
 /**
  * 保存到mongodb通道
@@ -20,13 +16,12 @@ import us.codecraft.webmagic.pipeline.*;
  * @date 2017年2月6日
  * @desc
  */
-@Component
-public class MongodbPipeline implements Pipeline {
+public class MongodbPipeline<T extends BaseRepository<E>, E extends BaseCatch> implements Pipeline {
+    private T baseRepository;
 
-    @Autowired
-    private ActivityRepository activityRepository;
-    @Autowired
-    private NewsRepository newsRepository;
+    public MongodbPipeline(T baseRepository) {
+        this.baseRepository = baseRepository;
+    }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
@@ -42,16 +37,17 @@ public class MongodbPipeline implements Pipeline {
     }
 
     public void handleModel(Object object) {
-        if (object instanceof Activity) {
-            Activity activity = (Activity) object;
-            if (!Strings.isNullOrEmpty(activity.getSourceUrl()) && this.activityRepository.findBySourceUrl(activity.getSourceUrl()) == null) {
-                this.activityRepository.save(activity);
-            }
-        } else if (object instanceof News) {
-            News news = (News) object;
-            if (!Strings.isNullOrEmpty(news.getSourceUrl()) && this.newsRepository.findBySourceUrl(news.getSourceUrl()) == null) {
-                this.newsRepository.save(news);
+
+        if (object instanceof BaseCatch) {
+            E e = (E) object;
+            e.setCreateTime(new Date());
+            String sourceUrl = e.getSourceUrl();
+            if (!Strings.isNullOrEmpty(sourceUrl) && this.baseRepository.findBySourceUrl(sourceUrl) == null) {
+                this.baseRepository.save(e);
             }
         }
+        /*
+         * if (object instanceof Activity) { Activity activity = (Activity) object; if (!Strings.isNullOrEmpty(activity.getSourceUrl()) && this.activityRepository.findBySourceUrl(activity.getSourceUrl()) == null) { this.activityRepository.save(activity); } } else if (object instanceof News) { News news = (News) object; if (!Strings.isNullOrEmpty(news.getSourceUrl()) && this.newsRepository.findBySourceUrl(news.getSourceUrl()) == null) { this.newsRepository.save(news); } }
+         */
     }
 }

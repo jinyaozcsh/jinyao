@@ -75,7 +75,7 @@ public class RedianProcessor implements PageProcessor {
                 List img = (List) request.getExtra("img");
                 Map<String, String> obj = (Map<String, String>) jsonParams.get("data");
                 String content = obj.get("content");
-                News news = new News(title, img, null, content, newsurl, null, "热点新闻", source, pushTime, new Date());
+                News news = new News(title, img, null, content, newsurl, null, "热点新闻", source, pushTime);
                 page.putField("model", news);
             }
         }

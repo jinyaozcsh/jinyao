@@ -48,7 +48,7 @@ public class TaskScheduler {
         }
     }
 
-    @Scheduled(cron = "0 59 * * * ?")
+    /*@Scheduled(cron = "0 59 * * * ?")
     public void catchSoundNews() {
         startCatchService.startSoundNews();
     }
@@ -61,5 +61,5 @@ public class TaskScheduler {
     @Scheduled(cron = "0 0 2 * * ?") // 每天2am
     public void catchCommunityActivity() throws Exception {
         startCatchService.startCommunityActivity();
-    }
+    }*/
 }
