@@ -100,7 +100,7 @@ public class CommuntiyNewsProcessor implements PageProcessor {
                 String name = request.getExtra("name").toString();
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(getImage(originalContent));
-                News news = new News(title, list, originalContent, content, sourceUrl, null, "社区新闻", source, pushTime);
+                News news = new News(title, list, originalContent, content, sourceUrl, null, "community", source, pushTime);
                 news.setRegion(name);
                 page.putField("model", news);
                 log.info("第一：" + news);

@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
  */
 public class Activity extends BaseCatch {
 
-    public static final String TYPE_COMMUNITY = "community";
+    public static final String TYPE_COMMUNITY = "SQHD";
 
     @Id
     private String id;

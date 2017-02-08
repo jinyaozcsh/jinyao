@@ -79,7 +79,7 @@ public class QuxianProcessor implements PageProcessor {
                 String content = obj.get("content");
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(img);
-                News news = new News(title, list, null, content, newsurl, null, "区县新闻", "东方网", pushTime);
+                News news = new News(title, list, content, content, newsurl, null, "county", "东方网", pushTime);
                 page.putField("model", news);
             }
         }

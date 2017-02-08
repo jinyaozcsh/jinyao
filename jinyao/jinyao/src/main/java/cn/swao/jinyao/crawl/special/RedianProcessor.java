@@ -45,12 +45,16 @@ public class RedianProcessor implements PageProcessor {
                 String source = param.get("source").toString();
                 String url = param.get("url").toString();
                 List<Map<String, String>> miniimg = (List<Map<String, String>>) param.get("miniimg");
+                List<String> img = new ArrayList<String>();
+                for (Map<String, String> mapimg : miniimg) {
+                    img.add(mapimg.get("src"));
+                }
                 String sourceUrl = String.format(detailUrl, rowkey, url);
                 Request request = new Request(sourceUrl);
                 request.putExtra("title", title);
                 request.putExtra("sourceUrl", sourceUrl);
                 request.putExtra("pushTime", pushTime);
-                request.putExtra("img", miniimg);
+                request.putExtra("img", img);
                 request.putExtra("source", source);
                 page.addTargetRequest(request);
             }
@@ -75,7 +79,7 @@ public class RedianProcessor implements PageProcessor {
                 List img = (List) request.getExtra("img");
                 Map<String, String> obj = (Map<String, String>) jsonParams.get("data");
                 String content = obj.get("content");
-                News news = new News(title, img, null, content, newsurl, null, "热点新闻", source, pushTime);
+                News news = new News(title, img, content, content, newsurl, null, "hot", source, pushTime);
                 page.putField("model", news);
             }
         }
