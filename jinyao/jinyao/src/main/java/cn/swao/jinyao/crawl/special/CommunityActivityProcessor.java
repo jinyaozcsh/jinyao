@@ -1,5 +1,9 @@
 package cn.swao.jinyao.crawl.special;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -8,8 +12,12 @@ import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.ArrayUtils;
+import cn.swao.baselib.util.DateUtils;
+import cn.swao.framework.api.CustomBizException;
 import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.model.Activity;
+import cn.swao.jinyao.pipeline.MongodbPipeline;
+import cn.swao.jinyao.repository.ActivityRepository;
 import cn.swao.jinyao.util.DataUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
@@ -97,33 +105,73 @@ public class CommunityActivityProcessor implements PageProcessor {
             } else {
                 // 正文
                 Request request = page.getRequest();
-                Object activityAddress = request.getExtra("activityAddress");
-                Object activityArea = request.getExtra("activityArea");
-                Object activityIconUrl = request.getExtra("activityIconUrl");
+                String activityAddress = (String) request.getExtra("activityAddress");
+                String activityArea = (String) request.getExtra("activityArea");
+                String activityIconUrl = (String) request.getExtra("activityIconUrl");
                 // Object activityId = request.getExtra("activityId");
-                Object activityName = request.getExtra("activityName");
-                Object activityStartTime = request.getExtra("activityStartTime");
-                Object activityEndTime = request.getExtra("activityEndTime");
+                String activityName = (String) request.getExtra("activityName");
+                String activityStartTime = (String) request.getExtra("activityStartTime");
+                String activityEndTime = (String) request.getExtra("activityEndTime");
                 String activityUrl = page.getUrl().get();
 
                 // 解析内容页面
                 String phone = page.getHtml().xpath("//*[@id='allInfo']//p[@class='phone']/span/text()").get();
                 String content = page.getHtml().xpath("//*[@id='allInfo']//div[@class='ad_intro']/html()").get();
+                String date = page.getHtml().xpath("//*[@id='allInfo']//p[@class='time']/span/text()").get().replace("\u00A0", "").trim();
+                String time = page.getHtml().xpath("//*[@id='allInfo']//p[@class='period']/span/text()").get().trim();
+                Date[] beginTimeAndEndTime = getBeginTimeAndEndTime(date, time);
                 Activity activity = new Activity();
-                activity.setTitle((String) activityName);
-                activity.setAddress((String) activityAddress);
-                activity.setBeginTime((String) activityStartTime);
-                activity.setEndTime((String) activityEndTime);
-                activity.setCoverImage(getImageUrl((String) activityIconUrl));
+                activity.setTitle(activityName);
+                activity.setAddress(activityAddress);
+                activity.setBeginTime(beginTimeAndEndTime[0]);
+                activity.setEndTime(beginTimeAndEndTime[1]);
+                activity.setCoverImage(getImageUrl(activityIconUrl));
                 activity.setOriginalContent(content);
                 activity.setCleanedContent(content);
                 activity.setPhone(phone);
                 activity.setSourceUrl(activityUrl);
-                activity.setRegion((String) activityArea);
+                activity.setRegion(activityArea.split(",")[1]);
                 activity.setType(Activity.TYPE_COMMUNITY);
                 page.putField("model", activity);
             }
         }
+    }
+
+    public Date[] getBeginTimeAndEndTime(String date, String time) {
+        String[] result = new String[2];
+        String[] times = time.split("-");
+        // 处理时间
+        if (times.length != 2) {
+            new CustomBizException("时间解析错误");
+        } else {
+            result[0] = times[0];
+            result[1] = times[1];
+        }
+        // 处理日期
+        if (date.contains("-")) {
+            String[] dates = date.split("-");
+            result[0] = dates[0].trim() + result[0];
+            result[1] = dates[1].trim() + result[1];
+
+        } else {
+            result[0] = date.trim() + result[0];
+            result[1] = date.trim() + result[1];
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日HH:mm");
+        Date[] dateResult = new Date[2];
+        try {
+            dateResult[0] = dateFormat.parse(result[0]);
+            dateResult[1] = dateFormat.parse(result[1]);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateResult;
+    }
+
+    public static void main(String[] args) {
+        Spider spider = Spider.create(new CommunityActivityProcessor());
+        spider.addUrl(CommunityActivityProcessor.START_URL);
+        spider.thread(10).run();
     }
 
     // 图片403
