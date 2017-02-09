@@ -1,5 +1,7 @@
 package cn.swao.jinyao.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 
 /**
@@ -15,8 +17,8 @@ public class Activity extends BaseCatch {
     private String id;
     private String title;
     private String address;
-    private String beginTime;
-    private String endTime;
+    private Date beginTime;
+    private Date endTime;
     private String coverImage;
     private String phone;
     private String type;
@@ -50,19 +52,19 @@ public class Activity extends BaseCatch {
         this.address = address;
     }
 
-    public String getBeginTime() {
+    public Date getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(String beginTime) {
+    public void setBeginTime(Date beginTime) {
         this.beginTime = beginTime;
     }
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
