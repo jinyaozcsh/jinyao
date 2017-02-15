@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.springframework.stereotype.Service;
 
-import cn.swao.baselib.util.JSONUtils;
+import cn.swao.baselib.util.*;
 import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.util.FileUtils;
@@ -79,6 +79,7 @@ public class RedianProcessor implements PageProcessor {
                 List img = (List) request.getExtra("img");
                 Map<String, String> obj = (Map<String, String>) jsonParams.get("data");
                 String content = obj.get("content");
+                content = HtmlUtils.simplifyContent(content);
                 News news = new News(title, img, content, content, newsurl, null, "hot", source, pushTime);
                 page.putField("model", news);
             }

@@ -2,9 +2,10 @@ package cn.swao.jinyao.crawl.special;
 
 import java.util.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cn.swao.baselib.util.JSONUtils;
+import cn.swao.baselib.util.*;
 import cn.swao.framework.util.WebUtils;
 import cn.swao.jinyao.model.News;
 import cn.swao.jinyao.util.FileUtils;
@@ -14,6 +15,8 @@ import us.codecraft.webmagic.processor.PageProcessor;
 @Service
 public class QuxianProcessor implements PageProcessor {
 
+    @Autowired
+    private ActualNewsProcessor actualNewsProcessor;
     public String url = "http://city.eastday.com/eastday/n1002826/n1004932/n1004933/n1007783/index_t1282.html";
     public String detailUrl = "http://share.eastday.com/newsapi/api/news/Detailmain/%s";
 
@@ -79,6 +82,8 @@ public class QuxianProcessor implements PageProcessor {
                 String content = obj.get("content");
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(img);
+                // 图片加前缀
+                content = HtmlUtils.simplifyContent(actualNewsProcessor.addImgPrefix("http://city.eastday.com/", content));
                 News news = new News(title, list, content, content, newsurl, null, "county", "东方网", pushTime);
                 page.putField("model", news);
             }
