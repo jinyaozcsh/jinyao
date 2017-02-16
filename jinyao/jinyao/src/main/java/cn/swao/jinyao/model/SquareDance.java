@@ -24,8 +24,17 @@ public class SquareDance extends BaseCatch {
     public String video_url;
     public String song_html;
     public String down_video_url;
+    public Integer videoCheckCount;
     public int status;
-    public List<Map<String, String>> songList;
+    public List<Map<String, Object>> songList;
+
+    public Integer getVideoCheckCount() {
+        return videoCheckCount;
+    }
+
+    public void setVideoCheckCount(Integer videoCheckCount) {
+        this.videoCheckCount = videoCheckCount;
+    }
 
     public String getId() {
         return id;
@@ -131,11 +140,11 @@ public class SquareDance extends BaseCatch {
         this.down_video_url = down_video_url;
     }
 
-    public List<Map<String, String>> getSongList() {
+    public List<Map<String, Object>> getSongList() {
         return songList;
     }
 
-    public void setSongList(List<Map<String, String>> songList) {
+    public void setSongList(List<Map<String, Object>> songList) {
         this.songList = songList;
     }
 

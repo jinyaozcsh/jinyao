@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import cn.swao.baselib.util.*;
+import cn.swao.jinyao.antiseptic.SquareDanceAntiseptic;
 import cn.swao.jinyao.crawl.special.*;
 import cn.swao.jinyao.model.*;
 import cn.swao.jinyao.pipeline.*;
@@ -111,6 +112,13 @@ public class StartCatchService {
             String format = String.format(squareDanceProcessor.baseUrl, i, currentTimeMillis + i);
             Spider.create(squareDanceProcessor).addPipeline(new MongodbPipeline<SquareDanceRepository, SquareDance>(squareDanceRepository)).addUrl(format).thread(5).run();
         }
+    }
+
+    @Autowired
+    private SquareDanceAntiseptic squareDanceAntiseptic;
+
+    public void checkSquarceDance() {
+        squareDanceAntiseptic.run();
     }
 
     public synchronized void save(String className, Hashtable<Object, Object> table) {
