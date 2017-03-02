@@ -29,16 +29,16 @@ public class SquareDanceProcessor implements PageProcessor {
 
     @Override
     public Site getSite() {
-        site = Site.me().setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36")/* .setHttpProxy(poxyService.getpoxy()) */.setSleepTime(2000).setTimeOut(5000).setRetryTimes(5);
+        site = Site.me().setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36") .setHttpProxy(poxyService.getpoxy()) .setSleepTime(500).setTimeOut(5000).setRetryTimes(5);
         return site;
     }
 
     @Override
     public void process(Page page) {
-        // site.setHttpProxy(poxyService.getpoxy());
+        site.setHttpProxy(poxyService.getpoxy());
+        try {
         String baseListUrl = page.getUrl().get();
         // json列表
-        try {
             if (baseListUrl.contains("http://www.999d.com/index.php?")) {
                 page.setSkip(true);
                 String jsonString = page.getJson().toString();
@@ -50,13 +50,20 @@ public class SquareDanceProcessor implements PageProcessor {
                     JsonObject jsonObject = it.next().getAsJsonObject();
                     String alias = jsonObject.get("alias").getAsString();// 别名
                     String title = jsonObject.get("title").getAsString();
-                    String[] split = alias.split(" ");
+                    
                     try {
-                        String dance_team = split[0];
+                        String[] split = alias.split(" ");
+                        List<String> li = new ArrayList<String>();
+                        for(String s:split){
+                            if(!Strings.isNullOrEmpty(s)){
+                                li.add(s);
+                            }
+                        }
+                        String dance_team = li.get(0);
                         squareDance.setTeam(dance_team);
-                        String dance_name = split[1];
+                        String dance_name = li.get(1);
                         squareDance.setName(dance_name);
-                        String action = split[2];
+                        String action = li.get(2);
                         squareDance.setType(action);
                     } catch (Exception e) {
                     }
@@ -89,7 +96,7 @@ public class SquareDanceProcessor implements PageProcessor {
                 Html html = page.getHtml();
                 String video_url = getVideoUrl(html);
                 // String song_html = html.xpath("//*[@id=\"song_download_" + id + "\"]/a/@href").get();
-                String down_video_url = html.xpath("/html/body/div[3]/div[4]/div[5]/a").get();
+                String down_video_url = html.xpath(/*"/html/body/div[4]/div[6]/div[5]/a/"*/"/html/body/div[3]/div[6]/div[5]/a[1]").get();
                 down_video_url = getSongUrl(down_video_url);
                 if (!Strings.isNullOrEmpty(album_id)) {
                     String song_html = String.format(songUrl, album_id.replaceAll("\"", ""));
@@ -134,6 +141,9 @@ public class SquareDanceProcessor implements PageProcessor {
     }
 
     public String getSongUrl(String down_song_url) {
+        if(Strings.isNullOrEmpty(down_song_url)){
+            return down_song_url;
+        }
         down_song_url = down_song_url.substring(down_song_url.indexOf("?"), down_song_url.indexOf("\">"));
         down_song_url = doman + "/api" + down_song_url.replaceAll("\"", "");
         down_song_url = down_song_url.replaceAll("amp;", "").replaceAll("&quot;", "").replaceAll(";", "");
@@ -154,13 +164,13 @@ public class SquareDanceProcessor implements PageProcessor {
         return video_url.replaceAll("'", "");
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         SquareDanceProcessor squareDanceProcessor = new SquareDanceProcessor();
         long currentTimeMillis = System.currentTimeMillis();
-        for (int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 2; i++) {
             String format = String.format(squareDanceProcessor.baseUrl, i, currentTimeMillis + i);
             Spider.create(squareDanceProcessor).addPipeline(new JsonFilePipeline("c:/squaredance11.txt")).addUrl(format).thread(1).run();
         }
-    }
+    }*/
 
 }
