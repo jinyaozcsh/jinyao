@@ -63,7 +63,7 @@ public class CommunityActivityProcessor implements PageProcessor {
             if (page.getUrl().regex(JSON_REGX).match()) {
                 try {
                     Map map = WebUtils.getJsonParams(page.getJson().get());
-                    List<Map<Object, Object>> list = (List<Map<Object, Object>>) map.get("list");
+                    List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("list");
                     // 数据不为空
                     if (!list.isEmpty()) {
                         synchronized (this) {

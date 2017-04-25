@@ -26,7 +26,7 @@ public class TaskScheduler {
     @Autowired
     public QuartzLogRepository quartzLogRepository;
 
-    @PostConstruct
+    //@PostConstruct
     public void doScheduleAuto() {
         List<Quartz> quartzList = quartzRepository.findAll();
         for (Quartz quartz : quartzList) {

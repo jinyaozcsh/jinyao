@@ -108,7 +108,7 @@ public class StartCatchService {
 
     public void catchSquareDance() {
         long currentTimeMillis = System.currentTimeMillis();
-        for (int i = 1; i < 10000; i++) {
+        for (int i = 1; i < 100; i++) {
             String format = String.format(squareDanceProcessor.baseUrl, i, currentTimeMillis + i);
             Spider.create(squareDanceProcessor).addPipeline(new MongodbPipeline<SquareDanceRepository, SquareDance>(squareDanceRepository)).addUrl(format).thread(5).run();
         }
@@ -135,5 +135,8 @@ public class StartCatchService {
         default:
             break;
         }
+    }
+    public void helle(){
+        System.out.println("hello StartCatchService");
     }
 }
